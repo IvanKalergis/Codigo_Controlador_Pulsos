@@ -13,7 +13,6 @@ from PySide2.QtWidgets import (
 from PySide2.QtGui import QPen,QColor
 import pyqtgraph as pg #para los gráficos de las secuencias
 import numpy as np
-from Sequence import Ui_Form  # Assuming the UI class is named Ui_MainWindow
 from PySide2.QtCore import QObject , Signal
 class Logic(QObject):
     #def __init__(self):
