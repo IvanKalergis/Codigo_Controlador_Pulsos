@@ -1,0 +1,12 @@
+pip install PySide2 
+pip show PySide2 "ensure its installed correctly"
+cd /path/to/your/ui/file   ---> cd /Users/ivankalergis/Desktop/Ipre/matlab/PySide2
+
+pyside2-uic filename.ui -o pythonfilename.py
+
+"if it doesnt recognize the command pyside2-uic then use this, to find the path to pyside2"
+find $(python3 -m site --user-base)/bin -name "pyside2-uic"
+/path/to/pyside2-uic input.ui -o output.py ---> /Users/ivankalergis/Library/Python/3.8/bin/pyside2-uic 
+
+
+
