@@ -5,4 +5,4 @@ class Pulse:
         self.pulse_width = pulse_width
         self.pulse_color = pulse_color
         self.pulse_tag = pulse_tag
-    
+        print('xd')
