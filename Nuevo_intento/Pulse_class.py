@@ -1,6 +1,6 @@
 #Clase para añadir pulsos a la secuencia de pulsos
 
-
+#Basically everything a pulse needs to have in order to be created, and also the requirments it need to serve in orther to function correctly
 class Pulse:
 
 
