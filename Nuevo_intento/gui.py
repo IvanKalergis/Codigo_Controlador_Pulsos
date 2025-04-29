@@ -77,10 +77,9 @@ class Window(QWidget,Ui_Form):
         """
         Displays an error message in a dialog box.
         """
-        print('Creating')
         dlg = QMessageBox(self)
         dlg.setWindowTitle("Error!")
-        dlg.setText(f"Label not Recognized, must be either Green, Yellow, Red, Apd, or Microwave")
+        dlg.setText(msg)
         dlg.setStandardButtons(QMessageBox.Ok)
         dlg.exec_()
 

@@ -80,11 +80,8 @@ class PulseManagerLogic(QObject):
                 self.Max_end_no_iter.append([flag[0]])
                 #print(f"iteration_list_saving:{self.iteration_list_saving}")"""
         else: 
-            dlg = QMessageBox(self.parent)
-            dlg.setWindowTitle("Error!")
-            dlg.setText(f"Channel {flag[0]} already added")
-            dlg.setStandardButtons(QMessageBox.Ok)
-            dlg.exec_()
+            self.error_str_signal.emit(f"Channel {flag[0]} already added")
+
         return flag
 
 
