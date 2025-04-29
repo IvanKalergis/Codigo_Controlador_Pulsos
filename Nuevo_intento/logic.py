@@ -16,7 +16,9 @@ import pyqtgraph as pg #para los gráficos de las secuencias
 import numpy as np
 from PySide2.QtCore import QObject , Signal
 
+
 class PulseManagerLogic(QObject):
+
 
     def __init__(self, parent=None):
         super(PulseManagerLogic, self).__init__()
@@ -97,3 +99,49 @@ class PulseManagerLogic(QObject):
             if channel.channel_tag == channel_tag:
                 channel.add_pulse(pulse_delay, pulse_width, pulse_tag)
                 break"""
+
+    """
+    def Add_to_List(self,channel,delay_on, delay_off,channel_label): #we add the channels to the list
+        channel=int(channel)
+        flag=[channel,delay_on,delay_off,channel_label]
+        Label_recognized=True #we assume fisrt that the lable is either green, or yellow or red or ...
+        lista=self.added_channels
+        
+            if Label_recognized==True:
+                flag_str = f"channel: {flag[0]}, delay_on: {abs(flag[1])}, delay_off: {abs(flag[2])}, {flag[3]}"  # Convert list to string
+                self.adding_list_signal.emit(flag_str)
+                #self.ui.Channel_List.addItem(flag_str) #we add the chanel with its protpertie to the list
+                self.added_channels.append(flag[0]) #add channel to the set
+                self.channel_labels.append([flag[0],flag[3]]) ##[[channel, label],[channel, label]] this will be used in update sequence and in remove channel
+                self.added_flags.append(flag)
+                self.Delays_channel.append([flag[0],[flag[1],flag[2]]])
+            
+                #  This is for the Add_Pulse function, to check if pb_pulses is empty, and the the channels accrodingly
+                if self.pb_pulses==[]: 
+                    for i in range(len(self.added_channels)):
+                        self.pb_pulses.append([self.added_channels[i]]) # we add the current channel_list, we should update it 
+                        self.Sequence_Pulses.append([self.added_channels[i]])
+                        self.Channel_Pulse_iter.append([self.added_channels[i]])
+                        self.Max_end_type.append([self.added_channels[i]])
+                        self.iteration_list_saving.append([self.added_channels[i]])
+                        self.Iteration_All.append([self.added_channels[i]])
+                        self.Iteration_All_PB.append([self.added_channels[i]])
+                        self.Max_end_no_iter.append([self.added_channels[i]])
+                else: #to update the lists when there is a new channel added to the added chanels list
+                    self.pb_pulses.append([flag[0]])
+                    self.Sequence_Pulses.append([flag[0]])
+                    self.Channel_Pulse_iter.append([flag[0]])
+                    self.Max_end_type.append([flag[0]])
+                    self.iteration_list_saving.append([flag[0]])
+                    self.Iteration_All.append([flag[0]])
+                    self.Iteration_All_PB.append([flag[0]])
+                    self.Max_end_no_iter.append([flag[0]])
+                    #print(f"iteration_list_saving:{self.iteration_list_saving}")
+        else: 
+            dlg = QMessageBox(self.parent)
+            dlg.setWindowTitle("Error!")
+            dlg.setText(f"Channel {flag[0]} already added")
+            dlg.setStandardButtons(QMessageBox.Ok)
+            dlg.exec_()
+        return flag
+    """

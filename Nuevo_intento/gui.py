@@ -12,7 +12,11 @@ from Sequence_one import Ui_Form  # Assuming the UI class is named Ui_MainWindow
 import os 
 os.environ["QT_MAC_WANTS_LAYER"] = "1" # This is needed for macOS Mojave and later
 from logic import PulseManagerLogic as PML
+
+
 class Window(QWidget,Ui_Form):
+
+
     def __init__(self):
 
         super(Window, self).__init__()
@@ -55,6 +59,7 @@ class Window(QWidget,Ui_Form):
         This function is called when the user clicks the "Add Channel" button.
         It checks if the channel is valid and adds it to the list.
         """
+
         channel_tag = self.ui.Channel_Identifier.currentIndex()
         print(channel_tag)
         delay= [self.ui.Delay_ON.value(),self.ui.Delay_OFF.value()]
@@ -66,6 +71,7 @@ class Window(QWidget,Ui_Form):
         This function is called when a channel is added to the list.
         It updates the list of channels in the GUI.
         """
+        
         #print(f"Adding channel: {flag_str}")
         self.ui.Channel_List.addItem(flag_str)
 
