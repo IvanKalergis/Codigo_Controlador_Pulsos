@@ -44,6 +44,7 @@ class Channel:
         return display_list
     error_adding_pulse=Signal(str)
     def Added_Pulses(self,start_time,width):
+        
         #the value of the channel   
         #we need to adjust the intervals to account for the delays 
         #including the delays
