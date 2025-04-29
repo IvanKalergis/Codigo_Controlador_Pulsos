@@ -72,13 +72,9 @@ class Window(QWidget,Ui_Form):
     
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    try:
-        #print("Creating window...")
-        window = Window()
-        #print("window defined")
-        window.show()
-        #print("Window shown.")
-    except Exception as e:
-        #print(f"Error creating window: {e}")
-        sys.exit(1)
+    print("Creating window...")
+    window = Window()
+    print("window defined")
+    window.show()
+    print("Window shown.")
     sys.exit(app.exec_())

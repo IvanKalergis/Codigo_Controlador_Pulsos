@@ -16,7 +16,7 @@ import pyqtgraph as pg #para los gráficos de las secuencias
 import numpy as np
 from PySide2.QtCore import QObject , Signal
 
-class PulseManagerLogic:
+class PulseManagerLogic(QObject):
 
     def __init__(self, parent=None):
         super(PulseManagerLogic, self).__init__()
@@ -25,6 +25,7 @@ class PulseManagerLogic:
         self.channels = [] # alist with all the createdi instances of the channels
         self.channel_labels = [] # Find a way to get rid of these extra variables
         self.Delays_channel = [] # Find a way to get rid of these extra variables
+
     adding_flag_to_list=Signal(str)
     def add_channel(self, channel_tag, channel_delay,channel_label): # Only function is to add the channel to the database if the conditions are met, it communicates with the GUI
         """
@@ -32,6 +33,7 @@ class PulseManagerLogic:
         """
         # Logic to add a channel to the database
         channel_tag=int(channel_tag)
+        flag= [channel_tag,channel_delay,channel_label]
         if channel_tag not in self.added_channel_tags:  # Check if channel is already added, #flag[0]
             #  This is for the Graphs in the Sequence Plot
             if channel_label=="green" or channel_label=="yellow" or channel_label=="red" or channel_label=="apd" or channel_label=="microwave":
@@ -46,12 +48,11 @@ class PulseManagerLogic:
                 dlg.exec_()
 
             if Label_recognized==True:
-                flag= [channel_tag,channel_delay,channel_label]
                 flag_str = f"channel: {flag[0]}, delay_on: {abs(flag[1][0])}, delay_off: {abs(flag[1][1])}, {flag[2]}"  # Convert list to string
                 self.adding_flag_to_list.emit(flag_str) #emit the signal to the GUI
 
                 self.added_channel_tags.append(flag[0]) #add channel to the set
-                self.channel_labels.append([flag[0],flag[3]]) ##[[channel, label],[channel, label]] this will be used in update sequence and in remove channel
+                self.channel_labels.append([flag[0],flag[2]]) ##[[channel, label],[channel, label]] this will be used in update sequence and in remove channel
                 self.Delays_channel.append([flag[0],[flag[1][0],flag[1][1]]])
                 channel = Channel(channel_tag, channel_label, channel_delay)
                 self.channels.append(channel) 
@@ -87,12 +88,12 @@ class PulseManagerLogic:
 
 
 
-    def add_pulse_to_channel(self, channel_tag, pulse_delay, pulse_width, pulse_tag):
-        """
-        Adds a pulse to a channel.
-        """
+    """def add_pulse_to_channel(self, channel_tag, pulse_delay, pulse_width, pulse_tag):
+    
+        #Adds a pulse to a channel.
+        
         # Logic to add a pulse to a channel
         for channel in self.channels:
             if channel.channel_tag == channel_tag:
                 channel.add_pulse(pulse_delay, pulse_width, pulse_tag)
-                break
+                break"""
