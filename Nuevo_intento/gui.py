@@ -61,6 +61,10 @@ class Window(QWidget,Ui_Form):
         channel_label = self.ui.Type_Channel.text()#we get the label of the channel from the gui
         channel_label=channel_label.lower() #we leave it undercase
         self.PML.add_channel(channel_tag,delay,channel_label)
+
+
+
+
     def update_list_channels(self, flag_str):
         """
         This function is called when a channel is added to the list.
@@ -68,6 +72,8 @@ class Window(QWidget,Ui_Form):
         """
         #print(f"Adding channel: {flag_str}")
         self.ui.Channel_List.addItem(flag_str)
+
+    
 
     
 if __name__ == "__main__":

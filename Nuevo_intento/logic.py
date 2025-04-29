@@ -16,6 +16,8 @@ import pyqtgraph as pg #para los gráficos de las secuencias
 import numpy as np
 from PySide2.QtCore import QObject , Signal
 
+
+# this class is for connecting to the gui and connecting the classes
 class PulseManagerLogic(QObject):
 
     def __init__(self, parent=None):
@@ -26,6 +28,7 @@ class PulseManagerLogic(QObject):
         self.channel_labels = [] # Find a way to get rid of these extra variables
         self.Delays_channel = [] # Find a way to get rid of these extra variables
 
+    ##### Adding a channel ####
     adding_flag_to_list=Signal(str)
     def add_channel(self, channel_tag, channel_delay,channel_label): # Only function is to add the channel to the database if the conditions are met, it communicates with the GUI
         """
@@ -56,6 +59,7 @@ class PulseManagerLogic(QObject):
                 self.Delays_channel.append([flag[0],[flag[1][0],flag[1][1]]])
                 channel = Channel(channel_tag, channel_label, channel_delay)
                 self.channels.append(channel) 
+                print(f"channel color: {channel.label}")
 
                 #  This is for the Add_Pulse function, to check if pb_pulses is empty, and the the channels accrodingly
                 """if self.pb_pulses==[]: 
@@ -87,13 +91,30 @@ class PulseManagerLogic(QObject):
         return flag
 
 
-
-    """def add_pulse_to_channel(self, channel_tag, pulse_delay, pulse_width, pulse_tag):
-    
-        #Adds a pulse to a channel.
-        
-        # Logic to add a pulse to a channel
-        for channel in self.channels:
-            if channel.channel_tag == channel_tag:
-                channel.add_pulse(pulse_delay, pulse_width, pulse_tag)
-                break"""
+    #in this method we must target the channel instances already created,
+    def add_pulse_to_channel(self, start_time, width,channel_tag):
+        #check if we got a channel to add the pulse
+        if len(self.channels)==0:
+            dlg = QMessageBox(self.parent)
+            dlg.setWindowTitle("Error!")
+            dlg.setText("No channels added")
+            dlg.setStandardButtons(QMessageBox.Ok)
+            dlg.exec_()
+            return
+        elif channel_tag not in self.added_channel_tags:
+            dlg = QMessageBox(self.parent)
+            dlg.setWindowTitle("Error!")
+            dlg.setText(f"Channel {channel_tag} not added")
+            dlg.setStandardButtons(QMessageBox.Ok)
+            dlg.exec_()
+        elif channel_tag in self.added_channel_tags:    
+            for channel in self.channels:
+                if channel.tag == channel_tag:
+                    channel.add_pulse(start_time,width)
+                    break
+    def showing_errors(self,error): 
+        dlg = QMessageBox(self.parent)
+        dlg.setWindowTitle("Error!")
+        dlg.setText(f"Overlapping pulses in channel {channel}")
+        dlg.setStandardButtons(QMessageBox.Ok)
+        dlg.exec_() 
