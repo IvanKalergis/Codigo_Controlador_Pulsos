@@ -1,5 +1,5 @@
 import sys
-from PySide2.QtCore import QTimer,Qt,Signal
+from PySide2.QtCore import QTimer,Qt,Signal, Slot
 from PySide2.QtWidgets import (
     QApplication,
     QWidget,
@@ -16,6 +16,8 @@ from logic import PulseManagerLogic as PML
 
 class Window(QWidget,Ui_Form):
 
+    add_channel_signal = Signal(int, list, str)  # Signal to add a channel
+
 
     def __init__(self):
 
@@ -23,7 +25,6 @@ class Window(QWidget,Ui_Form):
         #print("Initializing UI...")
         self.ui = Ui_Form() # initializes the UI form
         self.ui.setupUi(self)    
-        self.PML = PML(parent=self)
         #print("UI initialized.")
         self.ui.Delay_ON.setMaximum(1000000)  # Set to a large number as needed
         self.ui.Delay_ON.setMinimum(0)  
@@ -43,17 +44,12 @@ class Window(QWidget,Ui_Form):
         self.ui.Loop_Sequence.setValue(1)
         self.ui.ms.setValue(500) # a normal speed
 
-        ########## SIGNALS and connectios ##########
-        
-          ##### ADDING CHANNELS #####
+        ######## SIGNALS AND CONNECTIONS #######
         self.ui.Add_Channel.clicked.connect(self.add_channel_gui)
-        self.PML.adding_flag_to_list.connect(self.update_list_channels)
 
+    ######## METHODS ##############
 
-
-        ######## METHODS ##############
-
-            ##### ADDING CHANNELS #####
+    ##### ADDING CHANNELS #####
     def add_channel_gui(self):
         """
         This function is called when the user clicks the "Add Channel" button.
@@ -65,7 +61,8 @@ class Window(QWidget,Ui_Form):
         delay= [self.ui.Delay_ON.value(),self.ui.Delay_OFF.value()]
         channel_label = self.ui.Type_Channel.text()#we get the label of the channel from the gui
         channel_label=channel_label.lower() #we leave it undercase
-        self.PML.add_channel(channel_tag,delay,channel_label)
+        self.add_channel_signal.emit(channel_tag,delay,channel_label) #emit the signal to the logic
+
     def update_list_channels(self, flag_str):
         """
         This function is called when a channel is added to the list.
@@ -74,6 +71,18 @@ class Window(QWidget,Ui_Form):
         
         #print(f"Adding channel: {flag_str}")
         self.ui.Channel_List.addItem(flag_str)
+
+    @Slot(str)
+    def show_error_message(self, msg: str):
+        """
+        Displays an error message in a dialog box.
+        """
+        print('Creating')
+        dlg = QMessageBox(self)
+        dlg.setWindowTitle("Error!")
+        dlg.setText(f"Label not Recognized, must be either Green, Yellow, Red, Apd, or Microwave")
+        dlg.setStandardButtons(QMessageBox.Ok)
+        dlg.exec_()
 
     
 if __name__ == "__main__":

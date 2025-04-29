@@ -19,6 +19,7 @@ from PySide2.QtCore import QObject , Signal
 
 class PulseManagerLogic(QObject):
 
+    error_str_signal = Signal(str)
 
     def __init__(self, parent=None):
         super(PulseManagerLogic, self).__init__()
@@ -36,18 +37,16 @@ class PulseManagerLogic(QObject):
         # Logic to add a channel to the database
         channel_tag=int(channel_tag)
         flag= [channel_tag,channel_delay,channel_label]
+        
         if channel_tag not in self.added_channel_tags:  # Check if channel is already added, #flag[0]
             #  This is for the Graphs in the Sequence Plot
-            if channel_label=="green" or channel_label=="yellow" or channel_label=="red" or channel_label=="apd" or channel_label=="microwave":
+            if channel_label in ["green", "yellow", "red", "apd", "microwave"]:
                 Label_recognized=True
                 
             else: 
                 Label_recognized=False
-                dlg = QMessageBox(self.parent)
-                dlg.setWindowTitle("Error!")
-                dlg.setText(f"Label not Recognized, must be either Green, Yellow, Red, Apd, or Microwave")
-                dlg.setStandardButtons(QMessageBox.Ok)
-                dlg.exec_()
+                print('Emitted')
+                self.error_str_signal.emit(f"Label {channel_label} not recognized. Please use one of the following: green, yellow, red, apd, microwave")
 
             if Label_recognized==True:
                 flag_str = f"channel: {flag[0]}, delay_on: {abs(flag[1][0])}, delay_off: {abs(flag[1][1])}, {flag[2]}"  # Convert list to string
