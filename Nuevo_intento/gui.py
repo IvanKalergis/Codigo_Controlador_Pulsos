@@ -44,12 +44,10 @@ class Window(QWidget,Ui_Form):
           ##### ADDING CHANNELS #####
         self.ui.Add_Channel.clicked.connect(self.add_channel_gui)
         self.PML.adding_flag_to_list.connect(self.update_list_channels)
+        
+        ######## METHOD ##############
 
-
-
-        ######## METHODS ##############
-
-            ##### ADDING CHANNELS #####
+        ##### ADDING CHANNELS #####
     def add_channel_gui(self):
         """
         This function is called when the user clicks the "Add Channel" button.
@@ -75,7 +73,7 @@ class Window(QWidget,Ui_Form):
 
     
 
-    
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     print("Creating window...")

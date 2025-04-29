@@ -22,6 +22,8 @@ class Channel:
         status = self.check_pulse_compability(pulse)
         if status is True:
             self.pulse_list.append(pulse)
+
+
     
     def check_pulse_compability(self, pulse):
 
