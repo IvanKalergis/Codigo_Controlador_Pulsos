@@ -1,5 +1,5 @@
 import sys
-from PySide2.QtCore import QTimer,Qt,Signal
+from PySide2.QtCore import QTimer,Qt,Signal,Slot
 from PySide2.QtWidgets import (
     QApplication,
     QWidget,
@@ -44,9 +44,10 @@ class Window(QWidget,Ui_Form):
           ##### ADDING CHANNELS #####
         self.ui.Add_Channel.clicked.connect(self.add_channel_gui)
         self.PML.adding_flag_to_list.connect(self.update_list_channels)
-        
-        ######## METHOD ##############
-
+         
+        ######## Adding pulses ##############
+        self.PML.error_str_signal.connect(self.show_error_message)
+        self.ui.Add_Pulse.clicked.connect(self.add_pulse_gui)
         ##### ADDING CHANNELS #####
     def add_channel_gui(self):
         """
@@ -62,7 +63,7 @@ class Window(QWidget,Ui_Form):
 
 
 
-
+    @Slot(str) #The @Slot decorator in PySide2 is used to explicitly define a method as a slot, which can be connected to a signal. It improves performance and type safety by specifying the expected argument types.
     def update_list_channels(self, flag_str):
         """
         This function is called when a channel is added to the list.
@@ -71,7 +72,17 @@ class Window(QWidget,Ui_Form):
         #print(f"Adding channel: {flag_str}")
         self.ui.Channel_List.addItem(flag_str)
 
-    
+    @Slot(str)
+    def show_error_message(self, error_str):
+        """
+        This function is called when an error occurs.
+        It shows an error message to the user.
+        """
+        dlg = QMessageBox(self)
+        dlg.setWindowTitle("Error!")
+        dlg.setText(error_str)
+        dlg.setStandardButtons(QMessageBox.Ok)
+        dlg.exec_()
 
 
 if __name__ == "__main__":

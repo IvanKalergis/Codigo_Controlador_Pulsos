@@ -17,10 +17,6 @@ import numpy as np
 from PySide2.QtCore import QObject , Signal
 
 
-<<<<<<< HEAD
-# this class is for connecting to the gui and connecting the classes
-=======
->>>>>>> eb47bf094fae9f72ecab6c65b9add1a764b603c4
 class PulseManagerLogic(QObject):
 
     error_str_signal = Signal(str)
@@ -32,6 +28,7 @@ class PulseManagerLogic(QObject):
         self.channels = [] # alist with all the createdi instances of the channels
         self.channel_labels = [] # Find a way to get rid of these extra variables
         self.Delays_channel = [] # Find a way to get rid of these extra variables
+        self.Channel.error_adding_pulse
 
     ##### Adding a channel ####
     adding_flag_to_list=Signal(str)
@@ -92,29 +89,19 @@ class PulseManagerLogic(QObject):
 
 
     #in this method we must target the channel instances already created,
+    error_str_signal = Signal(str)
     def add_pulse_to_channel(self, start_time, width,channel_tag):
         #check if we got a channel to add the pulse
         if len(self.channels)==0:
-            dlg = QMessageBox(self.parent)
-            dlg.setWindowTitle("Error!")
-            dlg.setText("No channels added")
-            dlg.setStandardButtons(QMessageBox.Ok)
-            dlg.exec_()
+            self.error_str_signal.emit("No channels added")
             return
         elif channel_tag not in self.added_channel_tags:
-            dlg = QMessageBox(self.parent)
-            dlg.setWindowTitle("Error!")
-            dlg.setText(f"Channel {channel_tag} not added")
-            dlg.setStandardButtons(QMessageBox.Ok)
-            dlg.exec_()
+            self.error_str_signal.emit(f"Channel {channel_tag} not added")
+            
         elif channel_tag in self.added_channel_tags:    
             for channel in self.channels:
                 if channel.tag == channel_tag:
-                    channel.add_pulse(start_time,width)
+                    channel.Added_Pulses(start_time,width)
+                    channel.error_adding_pulse.connect(self.error_str_signal.emit)
                     break
-    def showing_errors(self,error): 
-        dlg = QMessageBox(self.parent)
-        dlg.setWindowTitle("Error!")
-        dlg.setText(f"Overlapping pulses in channel {channel}")
-        dlg.setStandardButtons(QMessageBox.Ok)
-        dlg.exec_() 
+        

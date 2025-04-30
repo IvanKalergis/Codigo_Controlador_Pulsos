@@ -9,7 +9,7 @@ class Channel:
 
     def __init__(self, tag, label, delay):
         #for each channel
-        self.tag = tag
+        self.tag = tag #the channel tag (ex: PB0, PB1, etc)
         self.label = label
         self.delay = delay
 
@@ -42,9 +42,11 @@ class Channel:
         """for pulse in self.pulse_list:
             display_list.append((pulse.pulse_delay, pulse.pulse_width, pulse.pulse_channel_tag))"""
         return display_list
+    
+
     error_adding_pulse=Signal(str)
     def Added_Pulses(self,start_time,width):
-        
+
         #the value of the channel   
         #we need to adjust the intervals to account for the delays 
         #including the delays
@@ -63,7 +65,7 @@ class Channel:
             Intended_interval=[start_time,start_time+width] #Shown in the graph  
                 #now we check if its possible account for the delays in the specific channel (checking if there are any other pulses in the same channel, that overlap with these intervals)
                 #allows me to not get an error: List index out of range in the first iteration
-            Index = self.find_indices_first_terms(self.pb_pulses, int(channel_tag) ) # we get the index of the combobox which is the value of the channel, we find the index of this value on pb_pulses
+            Index = self.find_indices_first_terms(self.pb_pulses, int(self.tag) ) # we get the index of the combobox which is the value of the channel, we find the index of this value on pb_pulses
                 #print(f"index: {Index}")
                 #print(f"pb_pulses: {len(self.pb_pulses[Index])}")
             if len(self.pb_pulses[Index]) > 1 : #if there are other puslse on the same channel we need to check for overlapping, and we also check if the list on the index has a sublist
@@ -80,7 +82,7 @@ class Channel:
                     #now we must check for overlapping with any of the pulses that have variations
                     #only if the variation pulse comes before the new pulse (oteriwse we asumme it is accounted for) and only if the pulse is type=0
                 if overlap_fixed_pulses==False: #we only check for overlapping on varying pulses if there wasnt overlapping on fixed pulses
-                    index_max_end_channel=self.find_indices_first_terms(self.Max_end_type, int(channel))
+                    index_max_end_channel=self.find_indices_first_terms(self.Max_end_type, int(self.tag))
                     if self.contains_sublists(self.Max_end_type)== True: # to check if there are actual variations of iterations in the respective channel
                         self.All_List=self.pulses_ordered_by_time_channels()  
                         self.All_List_PB=self.pulses_ordered_by_time_channels_pb() 
@@ -88,7 +90,7 @@ class Channel:
                             #print(f"All_List{self.All_List}")
                             #print(f"channel: {channel}")
                             #index_All_list=self.find_indices_first_terms(self.All_List,channel) # is returning a none TYpe
-                        index_All_list_pb=self.find_indices_first_terms(self.All_List_PB,channel)
+                        index_All_list_pb=self.find_indices_first_terms(self.All_List_PB,self.tag)
                             #filtered_list=self.All_List[index_All_list]
                         filtered_list_pb=self.All_List_PB[index_All_list_pb]
                             #print(f"filtered_list: {filtered_list}")
@@ -124,18 +126,10 @@ class Channel:
                                                  overlap_variations_pulses=True
     
                 if overlap_fixed_pulses==True: 
-                    self.error_adding_pulse.emit(f"Overlapping pulses in channel {channel_}")
-                    dlg = QMessageBox(self.parent)
-                    dlg.setWindowTitle("Error!")
-                    dlg.setText(f"Overlapping pulses in channel {channel}")
-                    dlg.setStandardButtons(QMessageBox.Ok)
-                    dlg.exec_() 
+                    self.error_adding_pulse.emit(f"Overlapping pulses in channel {self.tag}")
+
                 elif overlap_variations_pulses==True:
-                    dlg = QMessageBox(self.parent)
-                    dlg.setWindowTitle("Error!")
-                    dlg.setText(f"Overlapping pulses in channel {channel}, due to the increasing iteration on pulse: {Previous_Pulse}")
-                    dlg.setStandardButtons(QMessageBox.Ok)
-                    dlg.exec_() 
+                    self.error_adding_pulse.emit(f"Overlapping pulses in channel {self.tag}, due to the increasing iteration on pulse: {Previous_Pulse}")
                 else:
                         #print("No overlapping pulses2")
                     self.pb_pulses[Index].append(Adjusted_Interval) #we add the adjusted intervals to the sequence, this is for the pulse blaster
@@ -148,7 +142,7 @@ class Channel:
                     self.All_List=self.pulses_ordered_by_time_channels() 
                     self.All_List_PB=self.pulses_ordered_by_time_channels_pb()
                         #print(f"All_list: {self.All_List}")
-                    All_index_channel_pb=self.find_indices_first_terms(self.All_List_PB,channel)
+                    All_index_channel_pb=self.find_indices_first_terms(self.All_List_PB,self.tag)
                     Pulse=self.All_List_PB[All_index_channel_pb].index(Adjusted_Interval)
                         #print(f"Channel_Pulse_iter: {self.Channel_Pulse_iter}")
                         #see if there are other pulses infront of this new pulse
@@ -254,17 +248,10 @@ class Channel:
                         #print(f"Channel_Pulse_iter: {self.Channel_Pulse_iter}")
 
         elif Adjusted_Interval[0]<0: #if runned the interval fails to start after cero, and gives negative time which is not allowed
-            dlg = QMessageBox(self.parent)
-            dlg.setWindowTitle("Error!")
-            dlg.setText(f"Adjusting for the delay, gives negative start_time of {Adjusted_Interval[0]} ")
-            dlg.setStandardButtons(QMessageBox.Ok)
-            dlg.exec_()
+            self.error_adding_pulse.emit(f"Adjusting for the delay, gives negative start_time of {Adjusted_Interval[0]} ")
+            
         else:
-            dlg = QMessageBox(self.parent)
-            dlg.setWindowTitle("Error!")
-            dlg.setText(f"cannot adjust for the delay because width={width}<={delay_off}=delay_off")
-            dlg.setStandardButtons(QMessageBox.Ok)
-            dlg.exec_()             
+            self.error_adding_pulse.emit(f"cannot adjust for the delay because width={width}<={delay_off}=delay_off")          
         
         #print(f"All_List: {self.All_List}")
         #print(f"All_List_PB: {self.All_List_PB}")
