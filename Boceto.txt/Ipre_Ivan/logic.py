@@ -256,6 +256,7 @@ class Logic(QObject):
                         index_max_end_channel=self.find_indices_first_terms(self.Max_end_type, int(channel))
                         if self.contains_sublists(self.Max_end_type)== True: # to check if there are actual variations of iterations in the respective channel
                             self.All_List=self.pulses_ordered_by_time_channels()  
+                            print(f"All_List: {self.All_List}")
                             self.All_List_PB=self.pulses_ordered_by_time_channels_pb() 
                             #print(f"All_List_PB: {self.All_List_PB}")
                             #print(f"All_List{self.All_List}")

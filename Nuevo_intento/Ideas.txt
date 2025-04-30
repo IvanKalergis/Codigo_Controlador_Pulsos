@@ -4,10 +4,14 @@ Diferences bewteen Ipre and Nuevo intento:
 idea:
     maybe a great way to turn my code to a more efficient verison is to add a  sequence class. because a channel will be constituted of many sequences. for example if our experiment consititues of 100 iterations, and we have a sequence1 between the 0-->50 iteration and a sequence2 between the 51--->100 iteration. our channel must include both of this. 
 
-    We will also need to add the option when adding a pulse. if to add it to an specific sequence of the channel or to the whole channel
+    We will also need to add the option when adding a pulse. if to add it to an specific sequence of the channel or to the whole channel.
 
-Mayor change:
-    Before we used to add pulses to the whole channel, now when adding a pulse we must select between which iterations the pulse is added to and how it varies per iteration. We could also
+    Important idea: A sequence instance will correspond to 1 iteration of the loop of the experiment.
+
+Mayor change to the UI file:
+    Before we used to add pulses to the whole channel, now when adding a pulse we must select between which iterations the pulse is added to and how it varies per iteration.
+
+    This also forces us to when adding a pulse, specifiying on the combobox Type_Change if we wish to change a pulse or add a new one.
 
 To convert ui to py:
     - cd /Users/ivankalergis/Documents/GitHub/Codig_Controlador_Pulsos/Nuevo_intento
