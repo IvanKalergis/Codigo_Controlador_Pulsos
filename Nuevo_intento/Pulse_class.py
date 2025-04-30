@@ -4,11 +4,8 @@
 class Pulse:
 
 
-    def __init__(self, pulse_delay, pulse_width, pulse_tag):
-
-        self.pulse_delay = pulse_delay
-        self.pulse_width = pulse_width
-        self.pulse_tag = pulse_tag
-
+    def __init__(self,start_tail,end_tail): #we dont need the delay, right??
+        self.start_tail=start_tail
+        self.end_tail=end_tail
 
 #later we will have to add some methods for varying a pulse's width.

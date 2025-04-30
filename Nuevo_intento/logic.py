@@ -28,7 +28,6 @@ class PulseManagerLogic(QObject):
         self.channels = [] # alist with all the createdi instances of the channels
         self.channel_labels = [] # Find a way to get rid of these extra variables
         self.Delays_channel = [] # Find a way to get rid of these extra variables
-        self.Channel.error_adding_pulse
 
     ##### Adding a channel ####
     adding_flag_to_list=Signal(str)
@@ -90,7 +89,8 @@ class PulseManagerLogic(QObject):
 
     #in this method we must target the channel instances already created,
     error_str_signal = Signal(str)
-    def add_pulse_to_channel(self, start_time, width,channel_tag):
+    def add_pulse_to_channel(self, start_time, width,function_str, iteration_range,channel_tag,type_change):
+        """ here we check if we got a channel to add the pulse, then we call a method of the channels class, that creates a sequence per iteration."""
         #check if we got a channel to add the pulse
         if len(self.channels)==0:
             self.error_str_signal.emit("No channels added")
@@ -101,7 +101,7 @@ class PulseManagerLogic(QObject):
         elif channel_tag in self.added_channel_tags:    
             for channel in self.channels:
                 if channel.tag == channel_tag:
-                    channel.Added_Pulses(start_time,width)
-                    channel.error_adding_pulse.connect(self.error_str_signal.emit)
+                    channel.a_sequence(start_time,width,function_str,iteration_range,type_change)
+                    channel.error_adding_pulse_channel.connect(self.error_str_signal.emit)
                     break
         

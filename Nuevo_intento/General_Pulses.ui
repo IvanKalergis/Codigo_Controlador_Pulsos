@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1260</width>
-    <height>862</height>
+    <width>1064</width>
+    <height>672</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,10 +16,10 @@
   <widget class="QGroupBox" name="Sequence_Creation">
    <property name="geometry">
     <rect>
-     <x>30</x>
+     <x>20</x>
      <y>0</y>
-     <width>1171</width>
-     <height>711</height>
+     <width>1021</width>
+     <height>641</height>
     </rect>
    </property>
    <property name="title">
@@ -29,7 +29,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>40</y>
+      <y>30</y>
       <width>347</width>
       <height>51</height>
      </rect>
@@ -65,7 +65,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>440</y>
+      <y>370</y>
       <width>611</width>
       <height>241</height>
      </rect>
@@ -192,8 +192,8 @@
    <widget class="QGroupBox" name="groupBox_2">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>130</y>
+      <x>20</x>
+      <y>80</y>
       <width>571</width>
       <height>261</height>
      </rect>
@@ -238,10 +238,10 @@
    <widget class="QGroupBox" name="Define_Channels_2">
     <property name="geometry">
      <rect>
-      <x>680</x>
-      <y>60</y>
-      <width>381</width>
-      <height>231</height>
+      <x>630</x>
+      <y>80</y>
+      <width>371</width>
+      <height>221</height>
      </rect>
     </property>
     <property name="title">
@@ -497,10 +497,10 @@
    <widget class="QGroupBox" name="Define_Pulse">
     <property name="geometry">
      <rect>
-      <x>670</x>
+      <x>640</x>
       <y>310</y>
-      <width>441</width>
-      <height>371</height>
+      <width>391</width>
+      <height>291</height>
      </rect>
     </property>
     <property name="title">
@@ -511,8 +511,8 @@
       <rect>
        <x>0</x>
        <y>30</y>
-       <width>438</width>
-       <height>321</height>
+       <width>382</width>
+       <height>261</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
@@ -791,15 +791,6 @@
        </layout>
       </item>
       <item>
-       <widget class="QListWidget" name="Iteration_list">
-        <item>
-         <property name="text">
-          <string>The added pulses per channel will be shown here</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item>
        <layout class="QHBoxLayout" name="horizontalLayout_17">
         <item>
          <widget class="QPushButton" name="Clear_Changes">
@@ -828,9 +819,6 @@
          </widget>
         </item>
        </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_10"/>
       </item>
      </layout>
     </widget>

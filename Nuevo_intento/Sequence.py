@@ -7,23 +7,62 @@ class Sequence: #A sequence per iteration ( 1 frame)
     def __init__(self,iteration,tag):
         self.tag=tag #the channel tag (ex: PB0, PB1, etc)
         self.iteration=iteration #iteration of the sequence, meaning ex: the sequence appears in the 50th iteration of the experiment
-        self.pb_pulses=[] # this is the list of the pulses of this particular sequence that will be sent to the pulse blaster (accounting for delays)
-        self.pulses=[]  #this is the list of the pulses shown in the simulation.
-        self.Channel_Pulse_iter=[] # this is the list of the pulses in the channel, it will be used to check for overlapping, WE MIGHT NOT NEED THIS
-
-
-
-    """def add_pulse(self, pulse_delay, pulse_width): 
-        pulse = Pulse(pulse_delay, pulse_width, self.tag)
-        status = self.check_pulse_compability(pulse)
+        self.pb_pulses=[] # this is the list of the instances of pulses of this particular sequence that will be sent to the pulse blaster (accounting for delays)
+        self.pulses=[]  #this is the list of the instances of pulses shown in the simulation.
+        #elf.Channel_Pulse_iter=[] # this is the list of the pulses in the channel, it will be used to check for overlapping, WE MIGHT NOT NEED THIS
+        self.max_end_time_pb=0 # this is the end time of the sequence, it will be used to check if the pulse blaster is ready to send the next sequence
+        self.max_end_time=0
+    
+    error_adding_pulse=Signal(str)
+    def add_pulse(self, start_time,width,delay_on,delay_off): 
+        end_tail=start_time+width
+        start_tail=start_time
+        pulse=Pulse(start_tail,end_tail) #without delays
+        end_tail=start_time+width-delay_off
+        start_tail=start_time-delay_on
+        pulse_pb = Pulse(start_tail,end_tail) #with delays
+        status = self.check_pulse_compability(pulse_pb,delay_off,width) #check if the pulse doensnt overlap
         if status is True:
-            self.pb_pulses.append(pulse)"""
-
+            self.pb_pulses.append(pulse_pb)
+            self.pulses.append(pulse)
+        
 
     
-    def check_pulse_compability(self, pulse):
-
-        pass
+    def check_pulse_compability(self,pulse_pb,delay_off,width):
+        """
+        Here we must aim o see if the corresponding pulse overlaps with any of the the pb_pulses 
+        """
+        #the value of the channel   
+        #we need to adjust the intervals to account for the delays 
+        #including the delays
+        start_tail=pulse_pb.start_tail
+        end_tail=pulse_pb.end_tail
+        Adjusted_Interval=[start_tail,end_tail] #specifically for the Pulse_Blaster, these are the intervals that account for the delays to maintain the intended timeframes
+        
+        pulse_collapse=False
+        if delay_off>=width:
+            pulse_collapse=True
+            self.error_adding_pulse.emit(f"Pulse delay_off={delay_off}>{width}=width")
+        overlap_fixed_pulses=False #we define this variable to let the system know when there is an overlap with the fixed pulses
+        if Adjusted_Interval[0]>=0 and pulse_collapse==False: #if the adjustes_interval starts after or on 0=t, to avoid negative time 
+                #now we check if its possible account for the delays in the specific channel (checking if there are any other pulses in the same channel, that overlap with these intervals)
+                #allows me to not get an error: List index out of range in the first iteration
+            
+            if len(self.pb_pulses) > 0 : #if there are other puslse on the same channel we need to check for overlapping, and we also check if the list on the index has a sublist
+                for j in range(len(self.pb_pulses)): #we iterate over the pb_pulses in the respective channel, to check for overlapping
+                    if j>0:
+                        Partially_Left=(self.pb_pulses[j].start_tail<=end_tail and self.pb_pulses[0]>=start_tail) # if the the new pulse finishes after the start of the previous pulse and starts before the start of the previous pulse
+                        Partially_Right=(self.pb_pulses[j].end_tail<=end_tail and self.pb_pulses[j].end_tail>=start_tail) # if the new pulse finishes after the end of the previous pulse and starts before the end of the previous pulse
+                        Completely_Inside=(self.pb_pulses[j].start_tail<=start_tail and self.pb_pulses[j].end_tail>=end_tail) #if the new pulse starts after the start of the previous pulse and finishes before the end of the previous pulse
+                        Completely_Ontop=(self.pb_pulses[j].start_tail>=start_tail and self.pb_pulses[j].end_tail<=end_tail)
+                        
+                        if Partially_Left==True or Partially_Right==True or Completely_Inside==True or Completely_Ontop==True: #if the pulse is partially, or completely inside the interval the overlap varible becomes true
+                            overlap_fixed_pulses=True
+                            break #we stop the loop since we already found an overlap
+                if overlap_fixed_pulses==True: 
+                    self.error_adding_pulse.emit(f"Overlapping pulses in channel {self.tag} due to increasing pulse in iteration: {self.iteration}")
+        Collapse=pulse_collapse==True and overlap_fixed_pulses==True
+        return Collapse
 
     def clear(self):
         self.pulse_list = []
@@ -40,12 +79,10 @@ class Sequence: #A sequence per iteration ( 1 frame)
         return display_list
     
 
-    error_adding_pulse=Signal(str)
+    """def Added_Pulses(self,start_time,width,delay_on,delay_off):
+        
 
-    def Added_Pulses(self,start_time,width,delay_on,delay_off)
-        """
-        Here we must aim o see if the corresponding pulse overlaps with any of the the pb_pulses 
-        """
+        
         #the value of the channel   
         #we need to adjust the intervals to account for the delays 
         #including the delays
@@ -74,8 +111,9 @@ class Sequence: #A sequence per iteration ( 1 frame)
                         if Partially_Left==True or Partially_Right==True or Completely_Inside==True: #if the pulse is partially, or completely inside the interval the overlap varible becomes true
                             overlap_fixed_pulses=True
                             break #we stop the loop since we already found an overlap
+                        
                    
-                    """#######################################
+                    #######################################
                     #now we must check for overlapping with any of the pulses that have variations
                     #only if the variation pulse comes before the new pulse (oteriwse we asumme it is accounted for) and only if the pulse is type=0
                 if overlap_fixed_pulses==False: #we only check for overlapping on varying pulses if there wasnt overlapping on fixed pulses
@@ -113,34 +151,35 @@ class Sequence: #A sequence per iteration ( 1 frame)
                                         if len(self.Max_end_type[index_max_end_channel][Previous_Pulse])>1:
                                                 
                                             if self.Max_end_type[index_max_end_channel][Previous_Pulse][i][1]>start_tail:
-                                                 overlap_variations_pulses=True"""
+                                                 overlap_variations_pulses=True
     
-                if overlap_fixed_pulses==True: 
+                    if overlap_fixed_pulses==True: 
                     self.error_adding_pulse.emit(f"Overlapping pulses in channel {self.tag} due to increasing pulse in iteration: {self.iteration}")
 
-                    """elif overlap_variations_pulses==True:
-                    self.error_adding_pulse.emit(f"Overlapping pulses in channel {self.tag}, due to the increasing iteration on pulse: {Previous_Pulse}")"""
+                    elif overlap_variations_pulses==True:
+                    self.error_adding_pulse.emit(f"Overlapping pulses in channel {self.tag}, due to the increasing iteration on pulse: {Previous_Pulse}")
                 else:
                         
                     self.pb_pulses.append(Adjusted_Interval) #we add the adjusted intervals to the sequence, this is for the pulse blaster
                     self.pulses.append(Intended_interval)#we add the intended intervals to the sequence    
                     #self.update_graph_sequence() # this allows us to update the sequence in the graph
                         
-                    if self.Global_end_time<Adjusted_Interval[1]:
-                        self.Global_end_time=Adjusted_Interval[1]
-                    self.pulses=self.pulses_ordered_by_time_channels()  #we order the pulses by time (must edit this function)
-                    self.pb_pulses=self.pulses_ordered_by_time_channels_pb()
+                    if self.max_end_time_pb<Adjusted_Interval[1]:
+                        self.max_end_time_pb=Adjusted_Interval[1]
+                        self.max_end_time=Intended_interval[1]
+                    self.pulses=sorted(self.pulses,key=lambda x: x[0])  #we order the pulses by time 
+                    self.pb_pulses=sorted(self.pb_pulses,key=lambda x: x[0])  #we order the pulses by time 
                         
-    
+                    
                     Pulse=self.pb_pulses.index(Adjusted_Interval)
                         
                         #see if there are other pulses infront of this new pulse
-            ####### UPDATING THE UI IF THE NEW PULSE IS IN BETWEEN OTHER PREVIOUSLY ADDED
+                    ####### UPDATING THE UI IF THE NEW PULSE IS IN BETWEEN OTHER PREVIOUSLY ADDED
                     #we need to add the pulse number to the self.Channel_Pulse_iter
                     if len(self.Channel_Pulse_iter)==1:
                         self.Channel_Pulse_iter.append([1]) #this one simbolizes a pulse_1 we get = [ [channel,[1]] ]
-                        """self.Max_end_type.append([1],Intended_interval[1])
-                        self.Max_end_no_iter.append([1])"""
+                        #self.Max_end_type.append([1],Intended_interval[1])
+                        #self.Max_end_no_iter.append([1])
                             
                             #####################
                             #if we add a pulse in between 2 pulses
@@ -202,29 +241,31 @@ class Sequence: #A sequence per iteration ( 1 frame)
                 self.pb_pulses.append(Adjusted_Interval) #we add the adjusted intervals to the sequence, this is for the pulse blaster
                 self.pulses.append(Intended_interval)#we add the intended intervals to the sequence    
                 #self.update_graph_sequence() # this allows us to update the sequence in the graph
-                self.All_List=self.pulses_ordered_by_time_channels()  
-                self.All_List_PB=self.pulses_ordered_by_time_channels_pb()
-                if self.Global_end_time<Adjusted_Interval[1]:
-                    self.Global_end_time=Adjusted_Interval[1]
+                #self.All_List=self.pulses_ordered_by_time_channels()  
+                #self.All_List_PB=self.pulses_ordered_by_time_channels_pb()
+                if self.max_end_time_pb<Adjusted_Interval[1]:
+                    self.max_end_time_pb=Adjusted_Interval[1]
+                    self.max_end_time=Intended_interval[1]
                     #self.iteration_list_saving=[]
                     #we need to add the pulse number to the self.Channel_Pulse_iter
-                if len(self.Channel_Pulse_iter[Index])==1:
-                        self.Channel_Pulse_iter[Index].append([1]) #this one simbolizes a pulse_1 we get = [ [channel,[1]] ]
+                
+                if len(self.Channel_Pulse_iter)==1:
+                        self.Channel_Pulse_iter.append([1]) #this one simbolizes a pulse_1 we get = [ [channel,[1]] ]
                         #self.Max_end_type[Index].append([1])
                         #self.Max_end_no_iter[Index].append([1,Intended_interval[1]])
                         #self.Iteration_All[Index].append([1])
                         #self.Iteration_All_PB[Index].append([1])
                             #print(f"Channel_Pulse_iter: {self.Channel_Pulse_iter}")
                 else:
-                    index_previous=len(self.Channel_Pulse_iter[Index])-1 # here we get the index of the last pulse on the list Channel_Pulse_iter
-                    previous=self.Channel_Pulse_iter[Index][index_previous][0] # we save the previous pulse number
+                    index_previous=len(self.Channel_Pulse_iter)-1 # here we get the index of the last pulse on the list Channel_Pulse_iter
+                    previous=self.Channel_Pulse_iter[index_previous][0] # we save the previous pulse number
                     actual_pulse= previous + 1
-                    self.Channel_Pulse_iter[Index].append([actual_pulse]) #here we add the actual pulse number to the list
-                    self.Max_end_type[Index].append([actual_pulse])
-                    self.Max_end_no_iter[Index].append([actual_pulse,Intended_interval])
-                    self.Iteration_All[Index].append([actual_pulse])
-                    self.Iteration_All_PB[Index].append([actual_pulse])
-                        #print(f"Channel_Pulse_iter: {self.Channel_Pulse_iter}")
+                    self.Channel_Pulse_iter.append([actual_pulse]) #here we add the actual pulse number to the list
+                    #self.Max_end_type[Index].append([actual_pulse])
+                    #self.Max_end_no_iter[Index].append([actual_pulse,Intended_interval])
+                    #self.Iteration_All[Index].append([actual_pulse])
+                    #self.Iteration_All_PB[Index].append([actual_pulse])
+                    
 
         elif Adjusted_Interval[0]<0: #if runned the interval fails to start after cero, and gives negative time which is not allowed
             self.error_adding_pulse.emit(f"Adjusting for the delay, gives negative start_time of {Adjusted_Interval[0]} ")
@@ -234,3 +275,4 @@ class Sequence: #A sequence per iteration ( 1 frame)
         
   
         return [self.pb_pulses] # this is the sequence that will be used for the pulse blaster"""
+        

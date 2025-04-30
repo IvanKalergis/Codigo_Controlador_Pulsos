@@ -82,7 +82,7 @@ class Window(QWidget,Ui_Form):
         start_time = self.ui.StartTime.value()
         width = self.ui.Puls_Width.value()
         channel_tag = self.ui.Channel_Pulse.currentIndex() #we get the channel from the gui
-        function_str=self.ui.Function.currentText() #we get the function from the gui
+        function_str=self.ui.Function.text() #we get the function from the gui
         iteration_range = [self.ui.Iterations_start.value(),self.ui.Iterations_end.value()]
         type_change = self.ui.Type_Change.currentIndex()
         self.PML.add_pulse_to_channel(start_time, width,function_str,iteration_range, channel_tag,type_change)
