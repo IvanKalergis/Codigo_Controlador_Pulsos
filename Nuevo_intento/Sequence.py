@@ -3,8 +3,9 @@ from Pulse_class import Pulse
 from PySide2.QtCore import QObject , Signal
 
 
-class Sequence: #A sequence per iteration ( 1 frame)
+class Sequence(QObject): #A sequence per iteration ( 1 frame), QObject allows signasl to work
     def __init__(self,iteration,tag):
+        super().__init__()  # Call the base class's __init__ method
         self.tag=tag #the channel tag (ex: PB0, PB1, etc)
         self.iteration=iteration #iteration of the sequence, meaning ex: the sequence appears in the 50th iteration of the experiment
         self.pb_pulses=[] # this is the list of the instances of pulses of this particular sequence that will be sent to the pulse blaster (accounting for delays)
@@ -14,6 +15,7 @@ class Sequence: #A sequence per iteration ( 1 frame)
         self.max_end_time=0
     
     error_adding_pulse=Signal(str)
+    error_signal=Signal()
     def add_pulse(self, start_time,width,delay_on,delay_off): 
         end_tail=start_time+width
         start_tail=start_time
@@ -22,10 +24,10 @@ class Sequence: #A sequence per iteration ( 1 frame)
         start_tail=start_time-delay_on
         pulse_pb = Pulse(start_tail,end_tail) #with delays
         print(f"pulse:{pulse.start_tail,pulse.end_tail}")
-        """status = self.check_pulse_compability(pulse_pb,delay_off,width) #check if the pulse doensnt overlap
+        status = self.check_pulse_compability(pulse_pb,delay_off,width) #check if the pulse doensnt overlap
         if status is True:
             self.pb_pulses.append(pulse_pb)
-            self.pulses.append(pulse)"""
+            self.pulses.append(pulse) 
         
 
     

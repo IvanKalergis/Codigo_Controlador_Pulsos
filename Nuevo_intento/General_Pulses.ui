@@ -690,7 +690,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Width(i):</string>
+           <string>f:(W*i)</string>
           </property>
          </widget>
         </item>
@@ -703,7 +703,7 @@
            </size>
           </property>
           <property name="text">
-           <string>W*i </string>
+           <string/>
           </property>
          </widget>
         </item>

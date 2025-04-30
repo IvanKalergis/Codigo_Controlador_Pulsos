@@ -102,6 +102,7 @@ class PulseManagerLogic(QObject):
             for channel in self.channels:
                 if channel.tag == channel_tag:
                     channel.a_sequence(start_time,width,function_str,iteration_range,type_change)
+                    print(f"channel.a_sequence callled!!!")
                     channel.error_adding_pulse_channel.connect(self.error_str_signal.emit)
                     break
         

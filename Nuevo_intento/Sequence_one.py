@@ -19,13 +19,13 @@ class Ui_Form(object):
     def setupUi(self, Form):
         if not Form.objectName():
             Form.setObjectName(u"Form")
-        Form.resize(1260, 862)
+        Form.resize(1064, 672)
         self.Sequence_Creation = QGroupBox(Form)
         self.Sequence_Creation.setObjectName(u"Sequence_Creation")
-        self.Sequence_Creation.setGeometry(QRect(30, 0, 1171, 711))
+        self.Sequence_Creation.setGeometry(QRect(20, 0, 1021, 641))
         self.horizontalLayoutWidget = QWidget(self.Sequence_Creation)
         self.horizontalLayoutWidget.setObjectName(u"horizontalLayoutWidget")
-        self.horizontalLayoutWidget.setGeometry(QRect(20, 40, 347, 51))
+        self.horizontalLayoutWidget.setGeometry(QRect(20, 30, 347, 51))
         self.horizontalLayout_5 = QHBoxLayout(self.horizontalLayoutWidget)
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
         self.horizontalLayout_5.setContentsMargins(0, 0, 0, 0)
@@ -51,7 +51,7 @@ class Ui_Form(object):
 
         self.groupBox = QGroupBox(self.Sequence_Creation)
         self.groupBox.setObjectName(u"groupBox")
-        self.groupBox.setGeometry(QRect(20, 440, 611, 241))
+        self.groupBox.setGeometry(QRect(20, 370, 611, 241))
         self.Simulation = PlotWidget(self.groupBox)
         self.Simulation.setObjectName(u"Simulation")
         self.Simulation.setGeometry(QRect(0, 50, 601, 161))
@@ -114,7 +114,7 @@ class Ui_Form(object):
 
         self.groupBox_2 = QGroupBox(self.Sequence_Creation)
         self.groupBox_2.setObjectName(u"groupBox_2")
-        self.groupBox_2.setGeometry(QRect(40, 130, 571, 261))
+        self.groupBox_2.setGeometry(QRect(20, 80, 571, 261))
         self.Sequence_Diagram = PlotWidget(self.groupBox_2)
         self.Sequence_Diagram.setObjectName(u"Sequence_Diagram")
         self.Sequence_Diagram.setGeometry(QRect(10, 60, 551, 191))
@@ -126,7 +126,7 @@ class Ui_Form(object):
         self.Iteration_frame.setGeometry(QRect(190, 30, 91, 24))
         self.Define_Channels_2 = QGroupBox(self.Sequence_Creation)
         self.Define_Channels_2.setObjectName(u"Define_Channels_2")
-        self.Define_Channels_2.setGeometry(QRect(680, 60, 381, 231))
+        self.Define_Channels_2.setGeometry(QRect(630, 80, 371, 221))
         self.Add_Channel = QPushButton(self.Define_Channels_2)
         self.Add_Channel.setObjectName(u"Add_Channel")
         self.Add_Channel.setGeometry(QRect(250, 190, 113, 32))
@@ -185,10 +185,10 @@ class Ui_Form(object):
         self.label_15.setGeometry(QRect(180, 60, 88, 61))
         self.Define_Pulse = QGroupBox(self.Sequence_Creation)
         self.Define_Pulse.setObjectName(u"Define_Pulse")
-        self.Define_Pulse.setGeometry(QRect(670, 310, 441, 371))
+        self.Define_Pulse.setGeometry(QRect(640, 310, 391, 291))
         self.verticalLayoutWidget = QWidget(self.Define_Pulse)
         self.verticalLayoutWidget.setObjectName(u"verticalLayoutWidget")
-        self.verticalLayoutWidget.setGeometry(QRect(0, 30, 438, 321))
+        self.verticalLayoutWidget.setGeometry(QRect(0, 30, 382, 261))
         self.verticalLayout = QVBoxLayout(self.verticalLayoutWidget)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
@@ -335,12 +335,6 @@ class Ui_Form(object):
 
         self.verticalLayout.addLayout(self.horizontalLayout_12)
 
-        self.Iteration_list = QListWidget(self.verticalLayoutWidget)
-        QListWidgetItem(self.Iteration_list)
-        self.Iteration_list.setObjectName(u"Iteration_list")
-
-        self.verticalLayout.addWidget(self.Iteration_list)
-
         self.horizontalLayout_17 = QHBoxLayout()
         self.horizontalLayout_17.setObjectName(u"horizontalLayout_17")
         self.Clear_Changes = QPushButton(self.verticalLayoutWidget)
@@ -357,11 +351,6 @@ class Ui_Form(object):
 
 
         self.verticalLayout.addLayout(self.horizontalLayout_17)
-
-        self.horizontalLayout_10 = QHBoxLayout()
-        self.horizontalLayout_10.setObjectName(u"horizontalLayout_10")
-
-        self.verticalLayout.addLayout(self.horizontalLayout_10)
 
 
         self.retranslateUi(Form)
@@ -449,20 +438,13 @@ class Ui_Form(object):
         self.Channel_Pulse.setItemText(21, QCoreApplication.translate("Form", u"PB20", None))
 
         self.label_10.setText(QCoreApplication.translate("Form", u"Vary a pulse width:", None))
-        self.label_7.setText(QCoreApplication.translate("Form", u"Width(i):", None))
-        self.Function.setText(QCoreApplication.translate("Form", u"W*i ", None))
+        self.label_7.setText(QCoreApplication.translate("Form", u"f:(W*i)", None))
+        self.Function.setText("")
         self.label_11.setText(QCoreApplication.translate("Form", u"Iteration from:", None))
         self.label_12.setText(QCoreApplication.translate("Form", u"to", None))
         self.label_13.setText(QCoreApplication.translate("Form", u"Type:", None))
         self.Type_Change.setItemText(0, QCoreApplication.translate("Form", u"Add new pulse, with/without variations", None))
         self.Type_Change.setItemText(1, QCoreApplication.translate("Form", u"Vary an already added pulse", None))
-
-
-        __sortingEnabled1 = self.Iteration_list.isSortingEnabled()
-        self.Iteration_list.setSortingEnabled(False)
-        ___qlistwidgetitem1 = self.Iteration_list.item(0)
-        ___qlistwidgetitem1.setText(QCoreApplication.translate("Form", u"The added pulses per channel will be shown here", None));
-        self.Iteration_list.setSortingEnabled(__sortingEnabled1)
 
         self.Clear_Changes.setText(QCoreApplication.translate("Form", u"Clear", None))
         self.Add_Pulse.setText(QCoreApplication.translate("Form", u"Add", None))
