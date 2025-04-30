@@ -21,10 +21,11 @@ class Sequence: #A sequence per iteration ( 1 frame)
         end_tail=start_time+width-delay_off
         start_tail=start_time-delay_on
         pulse_pb = Pulse(start_tail,end_tail) #with delays
-        status = self.check_pulse_compability(pulse_pb,delay_off,width) #check if the pulse doensnt overlap
+        print(f"pulse:{pulse.start_tail,pulse.end_tail}")
+        """status = self.check_pulse_compability(pulse_pb,delay_off,width) #check if the pulse doensnt overlap
         if status is True:
             self.pb_pulses.append(pulse_pb)
-            self.pulses.append(pulse)
+            self.pulses.append(pulse)"""
         
 
     
