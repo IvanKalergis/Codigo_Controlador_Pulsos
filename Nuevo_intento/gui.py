@@ -72,6 +72,19 @@ class Window(QWidget,Ui_Form):
         #print(f"Adding channel: {flag_str}")
         self.ui.Channel_List.addItem(flag_str)
 
+
+    ##### ADDING PULSES ######
+    def add_pulse_gui(self):
+        """
+        This function is called when the user clicks the "Add Pulse" button.
+        It checks if the pulse is valid and adds it to the list.
+        """
+        start_time = self.ui.StartTime.value()
+        width = self.ui.Puls_Width.value()
+        channel_tag = self.ui.Channel_Pulse.currentText() #we get the channel from the gui
+        print(channel_tag)
+        self.PML.add_pulse_to_channel(start_time, width, channel_tag)
+        
     @Slot(str)
     def show_error_message(self, error_str):
         """

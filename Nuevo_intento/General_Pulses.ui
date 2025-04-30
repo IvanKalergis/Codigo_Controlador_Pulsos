@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1529</width>
-    <height>877</height>
+    <width>1260</width>
+    <height>862</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,628 +16,15 @@
   <widget class="QGroupBox" name="Sequence_Creation">
    <property name="geometry">
     <rect>
-     <x>200</x>
-     <y>20</y>
-     <width>1151</width>
+     <x>30</x>
+     <y>0</y>
+     <width>1171</width>
      <height>711</height>
     </rect>
    </property>
    <property name="title">
     <string>Pulse Blaster Sequence</string>
    </property>
-   <widget class="PlotWidget" name="Sequence_Diagram" native="true">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>150</y>
-      <width>591</width>
-      <height>191</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QGroupBox" name="Define_Pulse">
-    <property name="geometry">
-     <rect>
-      <x>640</x>
-      <y>320</y>
-      <width>451</width>
-      <height>371</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>Add pulse to sequence</string>
-    </property>
-    <widget class="QWidget" name="verticalLayoutWidget">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>30</y>
-       <width>441</width>
-       <height>331</height>
-      </rect>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>Start Time:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QDoubleSpinBox" name="StartTime"/>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string>Pulse Width</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QDoubleSpinBox" name="Puls_Width"/>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_3">
-          <item>
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>Channel:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QComboBox" name="Channel_Pulse">
-            <item>
-             <property name="text">
-              <string>N</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB0</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB1</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB2</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB3</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB4</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB5</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB6</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB7</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB8</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB9</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB10</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB11</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB12</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB13</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB14</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB15</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB16</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB17</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB18</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB19</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB20</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_9">
-          <property name="text">
-           <string>Add Pulse:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="Add_Pulse">
-          <property name="text">
-           <string>Add</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="real_width">
-          <property name="text">
-           <string>Real width: (       )</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_11">
-        <item>
-         <widget class="QLabel" name="label_10">
-          <property name="text">
-           <string>Vary a pulse width:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="Pulses_box"/>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_7">
-          <property name="maximumSize">
-           <size>
-            <width>51</width>
-            <height>24</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Width(i):</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="Function">
-          <property name="maximumSize">
-           <size>
-            <width>71</width>
-            <height>21</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>W*i </string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_9">
-        <item>
-         <widget class="QLabel" name="label_11">
-          <property name="maximumSize">
-           <size>
-            <width>91</width>
-            <height>16</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Iteration from:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QSpinBox" name="Iterations_start"/>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_12">
-          <property name="maximumSize">
-           <size>
-            <width>16</width>
-            <height>24</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>to</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QSpinBox" name="Iterations_end">
-          <property name="maximumSize">
-           <size>
-            <width>111</width>
-            <height>24</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_12">
-        <item>
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_13">
-          <property name="text">
-           <string>Type:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="Type_Change">
-          <item>
-           <property name="text">
-            <string>Only pulse moves </string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Whatever comes afer the pulse moves to the right</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>The whole sequence after the pulse moves to the right</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <widget class="QListWidget" name="Iteration_list">
-        <item>
-         <property name="text">
-          <string>The added pulses per channel will be shown here</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_17">
-        <item>
-         <widget class="QPushButton" name="Clear_Changes">
-          <property name="maximumSize">
-           <size>
-            <width>111</width>
-            <height>32</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Clear</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="Add_Change">
-          <property name="maximumSize">
-           <size>
-            <width>101</width>
-            <height>32</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Add</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_10"/>
-      </item>
-     </layout>
-    </widget>
-   </widget>
-   <widget class="QGroupBox" name="Define_Channels">
-    <property name="geometry">
-     <rect>
-      <x>640</x>
-      <y>30</y>
-      <width>381</width>
-      <height>261</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>Define Channels</string>
-    </property>
-    <widget class="QWidget" name="verticalLayoutWidget_2">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>20</y>
-       <width>351</width>
-       <height>191</height>
-      </rect>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_4">
-        <item>
-         <layout class="QVBoxLayout" name="verticalLayout_3">
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_8">
-            <item>
-             <widget class="QLabel" name="label_8">
-              <property name="text">
-               <string>Delay OFF:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QDoubleSpinBox" name="Delay_OFF"/>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_6">
-            <item>
-             <widget class="QLabel" name="label_4">
-              <property name="text">
-               <string>Delay ON:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QDoubleSpinBox" name="Delay_ON"/>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QVBoxLayout" name="verticalLayout_5">
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_7">
-            <item>
-             <widget class="QLabel" name="label_5">
-              <property name="text">
-               <string>Channel:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QComboBox" name="Channel_Identifier">
-              <item>
-               <property name="text">
-                <string>N</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>PB0</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>PB1</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>PB2</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>PB3</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>PB4</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>PB5</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>PB6</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>PB7</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>PB8</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>PB9</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>PB10</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>PB11</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>PB12</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>PB13</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>PB14</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>PB15</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>PB16</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>PB17</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>PB18</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>PB19</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>PB20</string>
-               </property>
-              </item>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QVBoxLayout" name="verticalLayout_4">
-            <item>
-             <widget class="QLineEdit" name="Type_Channel">
-              <property name="text">
-               <string>green</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <widget class="QListWidget" name="Channel_List">
-        <item>
-         <property name="text">
-          <string>The added channels will be shown here</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-    <widget class="QPushButton" name="Add_Channel">
-     <property name="geometry">
-      <rect>
-       <x>250</x>
-       <y>220</y>
-       <width>113</width>
-       <height>32</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Add</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="Clear_Channels">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>220</y>
-       <width>113</width>
-       <height>32</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Clear</string>
-     </property>
-    </widget>
-   </widget>
    <widget class="QWidget" name="horizontalLayoutWidget">
     <property name="geometry">
      <rect>
@@ -798,6 +185,652 @@
          <string>Duration: ( )</string>
         </property>
        </widget>
+      </item>
+     </layout>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_2">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>130</y>
+      <width>571</width>
+      <height>261</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Frames</string>
+    </property>
+    <widget class="PlotWidget" name="Sequence_Diagram" native="true">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>60</y>
+       <width>551</width>
+       <height>191</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="current_iteration_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>201</width>
+       <height>19</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Channels on each iteration: </string>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="Iteration_frame">
+     <property name="geometry">
+      <rect>
+       <x>190</x>
+       <y>30</y>
+       <width>91</width>
+       <height>24</height>
+      </rect>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="Define_Channels_2">
+    <property name="geometry">
+     <rect>
+      <x>680</x>
+      <y>60</y>
+      <width>381</width>
+      <height>231</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Define Channels</string>
+    </property>
+    <widget class="QPushButton" name="Add_Channel">
+     <property name="geometry">
+      <rect>
+       <x>250</x>
+       <y>190</y>
+       <width>113</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Add</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="Clear_Channels">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>190</y>
+       <width>113</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Clear</string>
+     </property>
+    </widget>
+    <widget class="QListWidget" name="Channel_List">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>110</y>
+       <width>331</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <item>
+      <property name="text">
+       <string>The added channels will be shown here</string>
+      </property>
+     </item>
+    </widget>
+    <widget class="QLabel" name="label_8">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>61</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Delay OFF:</string>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="Delay_OFF">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>40</y>
+       <width>81</width>
+       <height>24</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_4">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>70</y>
+       <width>61</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Delay ON:</string>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="Delay_ON">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>80</y>
+       <width>81</width>
+       <height>24</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="Type_Channel">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>80</y>
+       <width>121</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>green</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_5">
+     <property name="geometry">
+      <rect>
+       <x>180</x>
+       <y>20</y>
+       <width>88</width>
+       <height>61</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Channel:</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="Channel_Identifier">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>40</y>
+       <width>131</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <item>
+      <property name="text">
+       <string>N</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>PB0</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>PB1</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>PB2</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>PB3</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>PB4</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>PB5</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>PB6</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>PB7</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>PB8</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>PB9</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>PB10</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>PB11</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>PB12</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>PB13</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>PB14</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>PB15</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>PB16</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>PB17</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>PB18</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>PB19</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>PB20</string>
+      </property>
+     </item>
+    </widget>
+    <widget class="QLabel" name="label_15">
+     <property name="geometry">
+      <rect>
+       <x>180</x>
+       <y>60</y>
+       <width>88</width>
+       <height>61</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Type:</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="Define_Pulse">
+    <property name="geometry">
+     <rect>
+      <x>670</x>
+      <y>310</y>
+      <width>441</width>
+      <height>371</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Add pulse to sequence</string>
+    </property>
+    <widget class="QWidget" name="verticalLayoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>30</y>
+       <width>438</width>
+       <height>321</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Start Time:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QDoubleSpinBox" name="StartTime"/>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Pulse Width</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QDoubleSpinBox" name="Puls_Width"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>Channel:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="Channel_Pulse">
+            <item>
+             <property name="text">
+              <string>N</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PB0</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PB1</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PB2</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PB3</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PB4</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PB5</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PB6</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PB7</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PB8</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PB9</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PB10</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PB11</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PB12</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PB13</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PB14</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PB15</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PB16</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PB17</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PB18</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PB19</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PB20</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_11">
+        <item>
+         <widget class="QLabel" name="label_10">
+          <property name="text">
+           <string>Vary a pulse width:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="Pulses_box"/>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_7">
+          <property name="maximumSize">
+           <size>
+            <width>51</width>
+            <height>24</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Width(i):</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="Function">
+          <property name="maximumSize">
+           <size>
+            <width>71</width>
+            <height>21</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>W*i </string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_9">
+        <item>
+         <widget class="QLabel" name="label_11">
+          <property name="maximumSize">
+           <size>
+            <width>91</width>
+            <height>16</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Iteration from:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="Iterations_start"/>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_12">
+          <property name="maximumSize">
+           <size>
+            <width>16</width>
+            <height>24</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>to</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="Iterations_end">
+          <property name="maximumSize">
+           <size>
+            <width>111</width>
+            <height>24</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_12">
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_13">
+          <property name="text">
+           <string>Type:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="Type_Change">
+          <item>
+           <property name="text">
+            <string>Add new pulse, with/without variations</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Vary an already added pulse</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QListWidget" name="Iteration_list">
+        <item>
+         <property name="text">
+          <string>The added pulses per channel will be shown here</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_17">
+        <item>
+         <widget class="QPushButton" name="Clear_Changes">
+          <property name="maximumSize">
+           <size>
+            <width>111</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Clear</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="Add_Pulse">
+          <property name="maximumSize">
+           <size>
+            <width>85</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Add</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_10"/>
       </item>
      </layout>
     </widget>

@@ -55,8 +55,8 @@ class PulseManagerLogic(QObject):
                 self.adding_flag_to_list.emit(flag_str) #emit the signal to the GUI
 
                 self.added_channel_tags.append(flag[0]) #add channel to the set
-                self.channel_labels.append([flag[0],flag[2]]) ##[[channel, label],[channel, label]] this will be used in update sequence and in remove channel
-                self.Delays_channel.append([flag[0],[flag[1][0],flag[1][1]]])
+                """self.channel_labels.append([flag[0],flag[2]]) ##[[channel, label],[channel, label]] this will be used in update sequence and in remove channel
+                self.Delays_channel.append([flag[0],[flag[1][0],flag[1][1]]])"""
                 channel = Channel(channel_tag, channel_label, channel_delay)
                 self.channels.append(channel) 
                 print(f"channel color: {channel.label}")

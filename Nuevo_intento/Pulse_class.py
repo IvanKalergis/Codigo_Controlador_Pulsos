@@ -9,3 +9,6 @@ class Pulse:
         self.pulse_delay = pulse_delay
         self.pulse_width = pulse_width
         self.pulse_tag = pulse_tag
+
+
+#later we will have to add some methods for varying a pulse's width.
