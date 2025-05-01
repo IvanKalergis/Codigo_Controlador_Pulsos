@@ -19,7 +19,9 @@ class Channel(QObject):
     error_adding_pulse_channel=Signal(str) 
     def a_sequence(self,start_time,width,function_string,iteration_range,type_change): 
         """
-        First we check if the pulse can exist, then we need to check if the user wants to add or edit a pulse, then we add the pulses to the sequences and fuse pulses if needed.
+        First we check if the pulse can exist, then we need to check if the user wants to add or edit a pulse, 
+        then we add the pulses to the sequences and fuse pulses if needed. Finally we sort the whole self.Sequence_hub
+        by order of iteration. 
         """
         if self.delay[1]>=width:
        
@@ -32,7 +34,7 @@ class Channel(QObject):
         
             self.error_adding_pulse_channel.emit(f"Pulses starts with negative time{start_time_pb}")
             return None
-    
+
         if type_change==0:  #meaning we are adding a new pulse
             #temporary_sequence_hub=copy.deepcopy(self.Sequence_hub)#copy.copy,creates a new object but does not copy the objects within it. copy.deepcopy creates a new object and recursively copies all objects contained within the original object. 
             #we create a temporary sequence hub to check if there is an overlap
@@ -40,10 +42,13 @@ class Channel(QObject):
             for i in range(iteration_range[0],iteration_range[1]): # we iterate through the iteration range
                 print(f"iteration_channel_class: {i}")
 
-                """ now we need to calculate the width of the pulse, by plugging the initial width and the current iteration on the function"""
+                """ now we need to calculate the width of the pulse, by plugging the initial width and the current 
+                iteration on the function."""
 
                 #parameter to be replaced in the function
-
+                """generator expression: enumerate provides both the index and the element while iteratinf throught the list. next() efficiently 
+                finds the first match without iterating through the entire list"""
+                index = next((j for j, sequence in enumerate(self.Sequence_hub) if sequence.iteration == i), None)
                 #calcualte the width for this current iteration
                 if function_string!="":
                     #vthe variables on the funct_str must be W and i 
@@ -52,35 +57,29 @@ class Channel(QObject):
                     width=eval(function_string) #varied width
                     print(f"varied_width: {width}")
                 
-                if len(self.Sequence_hub)==0: #no sequences created
+                if index==None: #no sequences created
                     sequence_inst=Sequence(i,self.tag)
-                    print("first sequence created")
+                    print(f"first sequence on{i} created")
                     sequence_inst.add_pulse(start_time, width,self.delay[0],self.delay[1])
-                    print(f"sequence.add_pulse called")
+
+                    self.Sequence_hub.append(sequence_inst)
                     #sequence_inst.error_adding_pulse.connect(self.error_adding_pulse_channel.emit)
 
-                elif self.Sequence_hub[i].iteration==i: #this means there is already a sequence for this iteration
-                    print("another sequence created")
+                    #error: because when i=1 after i=0 a Sequence is created but it's on sequence_hub[0] thus sequence_hub[1] will be out of range
+                elif self.Sequence_hub[index].iteration==i: #this means there is already a sequence for this iteration
+                    print(f"sequence edited in {i}")
                     self.Sequence_hub[i].add_pulse(start_time, width,self.delay[0],self.delay[1]) #we add the pulse to the sequence)
-                    print(f"sequence.add_pulse called")
-                    #sequence_inst.error_adding_pulse.connect(self.error_adding_pulse_channel.emit) # we recieve the signal form the sequences inst and send it to the logic
-                
+                    
+           
+            self.Sequence_hub = sorted(self.Sequence_hub, key=lambda sequence: sequence.iteration) # Sort (order) the  self.Sequence_hub list by the `iteration` attribute
 
-                if len(self.Sequence_hub)==0:
-                    self.Sequence_hub.append(sequence_inst)
-                
 
 
         else: #meaning we are editing an existing pulse
 
             pass #leave this for later
 
-    """def handle_error(self, message):
-    
-        #Slot to handle errors emitted by the Sequence instance.
-        
-        print(f"Error received: {message}")
-        self.error_flag = True  # Set the flag to True when the signal is emitted"""
+
 
 
 
