@@ -8,6 +8,9 @@ idea:
 
     Important idea: A sequence instance will correspond to 1 iteration of the loop of the experiment.
 
+    What if we dont care if the pulse overlaps? if it overlaps we fuse them together.... and add the fused pulse to the sequence, 
+     -however we still need to finish erasing the pulses that were overlapped from the sequece
+
 Mayor change to the UI file:
     Before we used to add pulses to the whole channel, now when adding a pulse we must select between which iterations the pulse is added to and how it varies per iteration.
 

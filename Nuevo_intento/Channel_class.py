@@ -21,8 +21,12 @@ class Channel(QObject):
         """
         First we check if the pulse overlaps with any of the sequences created, then we need to check if the user wants to add or edit a pulse, then we add the pulses to the sequences
         """
+        if self.delay[1]>=width:
+       
+            self.error_adding_pulse_channel.emit(f"Pulse delay_off={self.delay[1]}>{width}=width")
+            return None
         if type_change==0:  #meaning we are adding a new pulse
-            temporary_sequence_hub=copy.deepcopy(self.Sequence_hub)#copy.copy,creates a new object but does not copy the objects within it. copy.deepcopy creates a new object and recursively copies all objects contained within the original object. 
+            #temporary_sequence_hub=copy.deepcopy(self.Sequence_hub)#copy.copy,creates a new object but does not copy the objects within it. copy.deepcopy creates a new object and recursively copies all objects contained within the original object. 
             #we create a temporary sequence hub to check if there is an overlap
 
             for i in range(iteration_range[0],iteration_range[1]): # we iterate through the iteration range
@@ -45,39 +49,30 @@ class Channel(QObject):
                     print("first sequence created")
                     sequence_inst.add_pulse(start_time, width,self.delay[0],self.delay[1])
                     print(f"sequence.add_pulse called")
-                    sequence_inst.error_adding_pulse.connect(self.error_adding_pulse_channel.emit)
+                    #sequence_inst.error_adding_pulse.connect(self.error_adding_pulse_channel.emit)
 
                 elif self.Sequence_hub[i].iteration==i: #this means there is already a sequence for this iteration
                     print("another sequence created")
-                    sequence_inst=self.Sequence_hub[i]
-                    sequence_inst.add_pulse(start_time, width,self.delay[0],self.delay[1]) #we add the pulse to the sequence)
+                    self.Sequence_hub[i].add_pulse(start_time, width,self.delay[0],self.delay[1]) #we add the pulse to the sequence)
                     print(f"sequence.add_pulse called")
-                    sequence_inst.error_adding_pulse.connect(self.error_adding_pulse_channel.emit) # we recieve the signal form the sequences inst and send it to the logic
-                    sequence_inst.error_adding_pulse.connect(self.handle_error)  # Connect the signal to the slot
+                    #sequence_inst.error_adding_pulse.connect(self.error_adding_pulse_channel.emit) # we recieve the signal form the sequences inst and send it to the logic
+                
 
-                if len(temporary_sequence_hub)==0:
-                    temporary_sequence_hub.append(sequence_inst)
-                elif len(temporary_sequence_hub)>0: #meaning we are creating a new sequence
-                    temporary_sequence_hub[i]=sequence_inst #we add the sequence to the hub
-
-                 # Check if an error occurred and exit the function. this way we dont update the sequence_hub if there is an overlap
-                if self.error_flag==True:
-                    print("Exiting a_sequence due to error.")
-                    return  # Exit the function immediately
-                else:
-                    self.Sequence_hub=temporary_sequence_hub
+                if len(self.Sequence_hub)==0:
+                    self.Sequence_hub.append(sequence_inst)
+                
 
 
         else: #meaning we are editing an existing pulse
 
             pass #leave this for later
 
-    def handle_error(self, message):
-        """
-        Slot to handle errors emitted by the Sequence instance.
-        """
+    """def handle_error(self, message):
+    
+        #Slot to handle errors emitted by the Sequence instance.
+        
         print(f"Error received: {message}")
-        self.error_flag = True  # Set the flag to True when the signal is emitted
+        self.error_flag = True  # Set the flag to True when the signal is emitted"""
 
 
 

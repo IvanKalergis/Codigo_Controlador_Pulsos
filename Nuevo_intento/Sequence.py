@@ -25,47 +25,108 @@ class Sequence(QObject): #A sequence per iteration ( 1 frame), QObject allows si
         pulse_pb = Pulse(start_tail,end_tail) #with delays
         print(f"pulse:{pulse.start_tail,pulse.end_tail}")
         status = self.check_pulse_compability(pulse_pb,delay_off,width) #check if the pulse doensnt overlap
-        if status is True:
-            self.pb_pulses.append(pulse_pb)
-            self.pulses.append(pulse) 
+        if status is not None:
+            if status[2]==True: #if there is no overlap with the fixed pulses
+                pulse_pb=Pulse(status[0][0],status[0][1]) #we create a new pulse with the fused intervals
+                pulse=Pulse(status[1][0],status[1][1])
+                self.pb_pulses.append(pulse_pb)
+                self.pulses.append(pulse) 
+            else: 
+                self.pb_pulses.append(pulse_pb)
+                self.pulses.append(pulse) 
         
 
     
-    def check_pulse_compability(self,pulse_pb,delay_off,width):
+    def check_pulse_compability(self,pulse_pb,pulse,delay_off,width):
         """
         Here we must aim o see if the corresponding pulse overlaps with any of the the pb_pulses 
         """
         #the value of the channel   
         #we need to adjust the intervals to account for the delays 
         #including the delays
-        start_tail=pulse_pb.start_tail
-        end_tail=pulse_pb.end_tail
+        start_tail_pb=pulse_pb.start_tail
+        end_tail_pb=pulse_pb.end_tail
+        start_tail=pulse.start_tail
+        end_tail=pulse.end_tail
         Adjusted_Interval=[start_tail,end_tail] #specifically for the Pulse_Blaster, these are the intervals that account for the delays to maintain the intended timeframes
         
         pulse_collapse=False
         if delay_off>=width:
             pulse_collapse=True
             self.error_adding_pulse.emit(f"Pulse delay_off={delay_off}>{width}=width")
+            return None
         overlap_fixed_pulses=False #we define this variable to let the system know when there is an overlap with the fixed pulses
+        #we define this variable to let the system know when there is an overlap with the fixed pulses
         if Adjusted_Interval[0]>=0 and pulse_collapse==False: #if the adjustes_interval starts after or on 0=t, to avoid negative time 
                 #now we check if its possible account for the delays in the specific channel (checking if there are any other pulses in the same channel, that overlap with these intervals)
                 #allows me to not get an error: List index out of range in the first iteration
             
             if len(self.pb_pulses) > 0 : #if there are other puslse on the same channel we need to check for overlapping, and we also check if the list on the index has a sublist
+                global_fusion_pb=[]
+                global_fusion=[]
                 for j in range(len(self.pb_pulses)): #we iterate over the pb_pulses in the respective channel, to check for overlapping
+                    fusion_list_pb=[] # we create a list to store the pulses that overlap
+                    fusion_list=[]
                     if j>0:
-                        Partially_Left=(self.pb_pulses[j].start_tail<=end_tail and self.pb_pulses[0]>=start_tail) # if the the new pulse finishes after the start of the previous pulse and starts before the start of the previous pulse
-                        Partially_Right=(self.pb_pulses[j].end_tail<=end_tail and self.pb_pulses[j].end_tail>=start_tail) # if the new pulse finishes after the end of the previous pulse and starts before the end of the previous pulse
-                        Completely_Inside=(self.pb_pulses[j].start_tail<=start_tail and self.pb_pulses[j].end_tail>=end_tail) #if the new pulse starts after the start of the previous pulse and finishes before the end of the previous pulse
-                        Completely_Ontop=(self.pb_pulses[j].start_tail>=start_tail and self.pb_pulses[j].end_tail<=end_tail)
-                        
-                        if Partially_Left==True or Partially_Right==True or Completely_Inside==True or Completely_Ontop==True: #if the pulse is partially, or completely inside the interval the overlap varible becomes true
+                        Partially_Left=(self.pb_pulses[j].start_tail<=end_tail_pb and self.pb_pulses[j].start_tail>=start_tail_pb) # if the the new pulse finishes after the start of the previous pulse and starts before the start of the previous pulse
+                        Partially_Right=(self.pb_pulses[j].end_tail>=start_tail_pb and self.pb_pulses[j].start_tail<=start_tail_pb) # if the new pulse finishes after the end of the previous pulse and starts before the end of the previous pulse
+                        Completely_Inside=(self.pb_pulses[j].start_tail_pb<=start_tail_pb and self.pb_pulses[j].end_tail_>=end_tail_pb) #if the new pulse starts after the start of the previous pulse and finishes before the end of the previous pulse
+                        Completely_Ontop=(self.pb_pulses[j].start_tail>=start_tail_pb and self.pb_pulses[j].end_tail<=end_tail_pb)
+                        """ Our objetvies it to fuse the overlapping pulses, into one pulse"""
+                        if Partially_Left==True:
+                            "we fuse the pulses together "
+                            fused_pulse_pb=[start_tail_pb,self.pb_pulses[j].end_tail_pb]
+                            fused_pulse=[start_tail,self.pulses[j].end_tail]
+                            fusion_list_pb.append(fused_pulse_pb)
+                            fusion_list.append(fused_pulse)
                             overlap_fixed_pulses=True
-                            break #we stop the loop since we already found an overlap
-                if overlap_fixed_pulses==True: 
-                    self.error_adding_pulse.emit(f"Overlapping pulses in channel {self.tag} due to increasing pulse in iteration: {self.iteration}")
-        Collapse=pulse_collapse==True and overlap_fixed_pulses==True
-        return Collapse
+
+                        elif Partially_Right==True:
+                            fused_pulse_pb=[self.pb_pulses[j].start_tail,end_tail_pb]
+                            fused_pulse=[self.pulses[j].start_tail,end_tail]
+                            fusion_list_pb.append(fused_pulse_pb)
+                            fusion_list.append(fused_pulse)
+                            overlap_fixed_pulses=True
+
+                        elif Completely_Inside==True:
+                            fused_pulse_pb=[self.pb_pulses[j].start_tail,self.pb_pulses[j].end_tail]
+                            fused_pulse=[self.pulses[j].start_tail,self.pulses[j].end_tail]
+                            fusion_list_pb.append(fused_pulse_pb)
+                            fusion_list.append(fused_pulse)
+                            overlap_fixed_pulses=True
+            
+
+                        elif Completely_Ontop==True:
+                            fused_pulse_pb=[start_tail_pb,end_tail_pb]
+                            fused_pulse=[start_tail,end_tail]
+                            fusion_list_pb.append(fused_pulse_pb)
+                            fusion_list.append(fused_pulse)
+                            overlap_fixed_pulses=True
+                      
+                    
+                    global_fusion_pb.append(self.fuse_pulses(fusion_list_pb))
+                    global_fusion.append(self.fuse_pulses(fusion_list))
+                fused_pulse_pb=self.fuse_pulses(global_fusion_pb)
+                fused_pulse=self.fuse_pulses(global_fusion)
+                if len(fused_pulse_pb)>0:
+                    return [fused_pulse_pb,fused_pulse,overlap_fixed_pulses]
+                else:
+                    return [[start_tail_pb,end_tail_pb],[start_tail,end_tail],overlap_fixed_pulses]
+                            
+                            
+        return [fused_pulse_pb,fused_pulse,overlap_fixed_pulses]
+    
+    def fuse_pulses(self,pulse_list):
+        """
+        When 2 or more pulses overlap, we need to fuse them into one pulse, this is done by taking the start and end time
+          of the pulses and creating a new pulse with the start and end time of the overlapping pulses
+          however there might be multiple overlapping pulses, so we neeed to fuse them all together
+        """
+        min_value = min(pulse_list, key=lambda x: x[0])[0]
+        max_value = max(pulse_list, key=lambda x: x[1])[1]
+        return [min_value, max_value]
+    
+
 
     def clear(self):
         self.pulse_list = []
