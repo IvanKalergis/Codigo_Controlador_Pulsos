@@ -10,11 +10,15 @@ idea:
 
     What if we dont care if the pulse overlaps? if it overlaps we fuse them together.... and add the fused pulse to the sequence, 
      -however we still need to finish erasing the pulses that were overlapped from the sequece
+     -Done, but when I delete the pulses then the list goes out of range in the for loop
+     -Done, it seems to be working when I fuse together pulses and also deleting the pulses that were already fused.
 
 Mayor change to the UI file:
     Before we used to add pulses to the whole channel, now when adding a pulse we must select between which iterations the pulse is added to and how it varies per iteration.
 
-    This also forces us to when adding a pulse, specifiying on the combobox Type_Change if we wish to change a pulse or add a new one.
+    This also forces us to when adding a pulse, specifiying on the combobox Type_Change if we wish to change a pulse or add a new one. But we can leave this for later
+
+    Also want to change the ui, to have the photo frames and the simulation in the same graph
 
 To convert ui to py:
     - cd /Users/ivankalergis/Documents/GitHub/Codig_Controlador_Pulsos/Nuevo_intento

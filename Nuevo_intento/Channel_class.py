@@ -19,12 +19,20 @@ class Channel(QObject):
     error_adding_pulse_channel=Signal(str) 
     def a_sequence(self,start_time,width,function_string,iteration_range,type_change): 
         """
-        First we check if the pulse overlaps with any of the sequences created, then we need to check if the user wants to add or edit a pulse, then we add the pulses to the sequences
+        First we check if the pulse can exist, then we need to check if the user wants to add or edit a pulse, then we add the pulses to the sequences and fuse pulses if needed.
         """
         if self.delay[1]>=width:
        
             self.error_adding_pulse_channel.emit(f"Pulse delay_off={self.delay[1]}>{width}=width")
             return None
+        
+        start_time_pb=start_time-self.delay[0]
+
+        if start_time_pb<0:
+        
+            self.error_adding_pulse_channel.emit(f"Pulses starts with negative time{start_time_pb}")
+            return None
+    
         if type_change==0:  #meaning we are adding a new pulse
             #temporary_sequence_hub=copy.deepcopy(self.Sequence_hub)#copy.copy,creates a new object but does not copy the objects within it. copy.deepcopy creates a new object and recursively copies all objects contained within the original object. 
             #we create a temporary sequence hub to check if there is an overlap
