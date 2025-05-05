@@ -33,6 +33,7 @@ class Window(QWidget,Ui_Form):
         self.ui.Iterations_start.setMaximum(1000000)
         self.ui.Iterations_start.setMinimum(0) 
         self.ui.Iterations_end.setMaximum(1000000)
+        self.ui.Iterations_end.setValue(5)
         self.ui.Iterations_end.setMinimum(self.ui.Iterations_start.value()+1) 
         self.ui.ms.setMaximum(1000000)
         self.ui.ms.setMinimum(1)
@@ -61,7 +62,8 @@ class Window(QWidget,Ui_Form):
         delay= [self.ui.Delay_ON.value(),self.ui.Delay_OFF.value()]
         channel_label = self.ui.Type_Channel.text()#we get the label of the channel from the gui
         channel_label=channel_label.lower() #we leave it undercase
-        self.PML.add_channel(channel_tag,delay,channel_label)
+        channel_count=self.ui.Channel_Identifier.count()
+        self.PML.add_channel(channel_tag,delay,channel_label,channel_count)
 
 
 
@@ -95,8 +97,7 @@ class Window(QWidget,Ui_Form):
     #### RUN Experiment ####
     def Run_Experiment_Gui(self):
         value_loop=self.ui.Loop_Sequence.value()
-        channel_count=self.ui.Channel_Identifier.count()
-        self.PML.Run_experiment(value_loop,channel_count)
+        self.PML.Run_experiment(value_loop)
 
     @Slot(str)
     def show_error_message(self, error_str):

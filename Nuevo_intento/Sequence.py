@@ -4,9 +4,10 @@ from PySide2.QtCore import QObject , Signal
 
 
 class Sequence(QObject): #A sequence per iteration ( 1 frame), QObject allows signasl to work
-    def __init__(self,iteration,tag):
+    def __init__(self,iteration,tag,binary):
         super().__init__()  # Call the base class's __init__ method
         self.tag=tag #the channel tag (ex: PB0, PB1, etc)
+        self.binary=binary
         self.iteration=iteration #iteration of the sequence, meaning ex: the sequence appears in the 50th iteration of the experiment
         self.pb_pulses=[] # this is the list of the instances of pulses of this particular sequence that will be sent to the pulse blaster (accounting for delays)
         self.pulses=[]  #this is the list of the instances of pulses shown in the simulation.
@@ -23,17 +24,17 @@ class Sequence(QObject): #A sequence per iteration ( 1 frame), QObject allows si
     def add_pulse(self, start_time,width,delay_on,delay_off): 
         end_tail=start_time+width
         start_tail=start_time
-        pulse=Pulse(start_tail,end_tail,self.tag) #without delays
+        pulse=Pulse(start_tail,end_tail,self.binary) #without delays
 
         end_tail=start_time+width-delay_off
         start_tail=start_time-delay_on
-        pulse_pb = Pulse(start_tail,end_tail,self.tag) #with delays
+        pulse_pb = Pulse(start_tail,end_tail,self.binary) #with delays
         
         status = self.check_pulse_fusion(pulse_pb,pulse) #check if the pulse doensnt overlap
         print(f"Fusion?: {status[2]}")
         if status[2]==True: #if there is no overlap with the fixed pulses
-            pulse_pb=Pulse(status[0][0],status[0][1],self.tag) #we create a new pulse with the fused intervals
-            pulse=Pulse(status[1][0],status[1][1],self.tag)
+            pulse_pb=Pulse(status[0][0],status[0][1],self.binary) #we create a new pulse with the fused intervals
+            pulse=Pulse(status[1][0],status[1][1],self.binary)
             self.pb_pulses.append(pulse_pb)
             self.pulses.append(pulse) 
             print(f"pb_pulses added: {pulse_pb.start_tail}, {pulse_pb.end_tail}")

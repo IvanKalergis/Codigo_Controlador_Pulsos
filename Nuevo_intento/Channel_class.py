@@ -7,7 +7,7 @@ import copy #we do this to work with the
 # Otherwise if it violates the requirments it will let the user know, and it will not be created.
 class Channel(QObject):
 
-    def __init__(self, tag, label, delay):
+    def __init__(self, tag, binary,label, delay):
         super().__init__()  # Call the base class's __init__ method
         #for each channel
         self.tag = tag #the channel tag (ex: PB0, PB1, etc)
@@ -15,6 +15,7 @@ class Channel(QObject):
         self.delay = delay
         self.Sequence_hub=[] #in this list we keep all the sequences creates
         self.error_flag = False  # Flag to track if an error occurred
+        self.binary=binary
 
     error_adding_pulse_channel=Signal(str) 
     def a_sequence(self,start_time,width,function_string,iteration_range,type_change): 
@@ -62,7 +63,7 @@ class Channel(QObject):
                     print(f"varied_width: {new_width}")
                 
                 if index==None: #no sequences created
-                    sequence_inst=Sequence(k,self.tag)
+                    sequence_inst=Sequence(k,self.tag,self.binary)
                     print(f"first sequence on{k} created")
                     sequence_inst.add_pulse(start_time, new_width,self.delay[0],self.delay[1])
 
@@ -81,10 +82,18 @@ class Channel(QObject):
 
             pass #leave this for later
     def a_experiment(self,i):
-        """ if we find a sequence for the iteration i we return the values if not we return None"""
+        """ if we find a sequence for the iteration i we return the values if not we return None. 
+            This method is mainly to fetch data for the experiment"""
         for seq in self.Sequence_hub: 
             if seq.iteration==i: 
-                return [seq.pb_pulses,seq.pulses]
+                return seq.pb_pulses #since its for the experiment we only need to do pb_  for this
+        return None
+    def a_display(self,i):
+        """ if we find a sequence for the iteration i we return the values if not we return None. 
+            This method is mainly to fetch data for the display"""
+        for seq in self.Sequence_hub: 
+            if seq.iteration==i: 
+                return seq.pulses #since its for the experiment we only need to do pb_  for this
         return None
         
 
