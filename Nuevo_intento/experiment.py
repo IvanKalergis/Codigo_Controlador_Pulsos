@@ -13,6 +13,7 @@ class Experiment(QObject):
     def Run_Exp(self):
         if len(self.Exp_i_pb)!=0: 
             self.Order_Exp_i_pb()
+            self.Send_Spinapi()
         else: #send error message   
             pass
         print(f"len(self.pb_sequence):{len(self.pb_sequence)}")
@@ -60,3 +61,9 @@ class Experiment(QObject):
             last_time = time
 
         return 
+    
+
+    def Send_Spinapi(self):
+        """ We send the pulses to spinapi in the correct order
+        """
+        pass
