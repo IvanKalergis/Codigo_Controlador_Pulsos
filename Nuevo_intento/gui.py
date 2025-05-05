@@ -38,6 +38,7 @@ class Window(QWidget,Ui_Form):
         self.ui.ms.setMinimum(1)
         self.ui.Loop_Sequence.setValue(1)
         self.ui.ms.setValue(500) # a normal speed
+        self.ui.Run_Sequence.clicked.connect(self.Run_Experiment_Gui)
 
         ########## SIGNALS and connectios ##########
         
@@ -45,9 +46,10 @@ class Window(QWidget,Ui_Form):
         self.ui.Add_Channel.clicked.connect(self.add_channel_gui)
         self.PML.adding_flag_to_list.connect(self.update_list_channels)
          
-        ######## Adding pulses ##############
+        ######## Adding and varying pulses ##############
         self.PML.error_str_signal.connect(self.show_error_message)
         self.ui.Add_Pulse.clicked.connect(self.add_pulse_gui)
+        self.ui.Iterations_start.valueChanged.connect(self.set_max)
         ##### ADDING CHANNELS #####
     def add_channel_gui(self):
         """
@@ -86,6 +88,15 @@ class Window(QWidget,Ui_Form):
         iteration_range = [self.ui.Iterations_start.value(),self.ui.Iterations_end.value()]
         type_change = self.ui.Type_Change.currentIndex()
         self.PML.add_pulse_to_channel(start_time, width,function_str,iteration_range, channel_tag,type_change)
+
+    def set_max(self): # as soon as I change the value fo the Iteration_start, the Iteration _end, allow numbers bigger than the Iterations_start
+        self.ui.Iterations_end.setMinimum(self.ui.Iterations_start.value()+1) 
+    
+    #### RUN Experiment ####
+    def Run_Experiment_Gui(self):
+        value_loop=self.ui.Loop_Sequence.value()
+        channel_count=self.ui.Channel_Identifier.count()
+        self.PML.Run_experiment(value_loop,channel_count)
 
     @Slot(str)
     def show_error_message(self, error_str):

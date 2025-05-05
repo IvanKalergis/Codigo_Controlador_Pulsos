@@ -28,6 +28,7 @@ class PulseManagerLogic(QObject):
         self.channels = [] # alist with all the createdi instances of the channels
         self.channel_labels = [] # Find a way to get rid of these extra variables
         self.Delays_channel = [] # Find a way to get rid of these extra variables
+        self.Experiment_Hub=[] # list of objects were each object is a 
 
     ##### Adding a channel ####
     adding_flag_to_list=Signal(str)
@@ -60,27 +61,6 @@ class PulseManagerLogic(QObject):
                 self.channels.append(channel) 
                 print(f"channel color: {channel.label}")
 
-                #  This is for the Add_Pulse function, to check if pb_pulses is empty, and the the channels accrodingly
-                """if self.pb_pulses==[]: 
-                    for i in range(len(self.added_channels)):
-                        self.pb_pulses.append([self.added_channels[i]]) # we add the current channel_list, we should update it 
-                        self.Sequence_Pulses.append([self.added_channels[i]])
-                        self.Channel_Pulse_iter.append([self.added_channels[i]])
-                        self.Max_end_type.append([self.added_channels[i]])
-                        self.iteration_list_saving.append([self.added_channels[i]])
-                        self.Iteration_All.append([self.added_channels[i]])
-                        self.Iteration_All_PB.append([self.added_channels[i]])
-                        self.Max_end_no_iter.append([self.added_channels[i]])
-                #else: #to update the lists when there is a new channel added to the added chanels list
-                self.pb_pulses.append([flag[0]])
-                self.Sequence_Pulses.append([flag[0]])
-                self.Channel_Pulse_iter.append([flag[0]])
-                self.Max_end_type.append([flag[0]])
-                self.iteration_list_saving.append([flag[0]])
-                self.Iteration_All.append([flag[0]])
-                self.Iteration_All_PB.append([flag[0]])
-                self.Max_end_no_iter.append([flag[0]])
-                #print(f"iteration_list_saving:{self.iteration_list_saving}")"""
         else: 
             self.error_str_signal.emit(f"Channel {flag[0]} already added")
 
@@ -105,4 +85,14 @@ class PulseManagerLogic(QObject):
                     print(f"channel.a_sequence callled!!!")
                     channel.error_adding_pulse_channel.connect(self.error_str_signal.emit)
                     break
-        
+    
+    def Run_experiment(self,value_loop,channel_count):
+        """ here we iterate through each iteration of the loop to find the channels that have a sequence for that iteration 
+            then we order them in class well call experiment. From which we create a list of objects self.experiment_hub"""
+        for i in range(0,value_loop): #we iterate per each iteration of the experiment
+            for channel in self.channels:
+                list_channel_sequence=channel.a_experiment(i)
+
+
+
+    

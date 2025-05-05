@@ -4,8 +4,9 @@
 class Pulse:
 
 
-    def __init__(self,start_tail,end_tail): #we dont need the delay, right??
+    def __init__(self,start_tail,end_tail,channel_tag): #we dont need the delay, right??
         self.start_tail=start_tail
         self.end_tail=end_tail
+        self.channel_tag=channel_tag
 
 #later we will have to add some methods for varying a pulse's width.

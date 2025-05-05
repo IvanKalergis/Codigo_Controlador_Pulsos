@@ -36,11 +36,13 @@ class Channel(QObject):
             return None
 
         if type_change==0:  #meaning we are adding a new pulse
-            #temporary_sequence_hub=copy.deepcopy(self.Sequence_hub)#copy.copy,creates a new object but does not copy the objects within it. copy.deepcopy creates a new object and recursively copies all objects contained within the original object. 
-            #we create a temporary sequence hub to check if there is an overlap
+            """ here we need to make for example if iter 
+                range [50,55] --> [1,2,3,4,5,6] to plug it into 
+                the function for the new width
+                """
 
-            for i in range(iteration_range[0],iteration_range[1]): # we iterate through the iteration range
-                print(f"iteration_channel_class: {i}")
+            for k in range(iteration_range[0],iteration_range[1]+1): # we iterate through the iteration range, +1 for it to include the [50,55] last bracket term
+                print(f"iteration_channel_class: {k}")
 
                 """ now we need to calculate the width of the pulse, by plugging the initial width and the current 
                 iteration on the function."""
@@ -48,37 +50,43 @@ class Channel(QObject):
                 #parameter to be replaced in the function
                 """generator expression: enumerate provides both the index and the element while iteratinf throught the list. next() efficiently 
                 finds the first match without iterating through the entire list"""
-                index = next((j for j, sequence in enumerate(self.Sequence_hub) if sequence.iteration == i), None)
+                index = next((j for j, sequence in enumerate(self.Sequence_hub) if sequence.iteration == k), None)
                 #calcualte the width for this current iteration
+                new_width=width
                 if function_string!="":
+                    print(f"function string:{function_string}, width:{width}")
                     #vthe variables on the funct_str must be W and i 
                     W=width
-                    i=i
-                    width=eval(function_string) #varied width
-                    print(f"varied_width: {width}")
+                    i=k-iteration_range[0] + 1 # here we need to make for example if iter range [50,55] and i=50 we need x=1, the +1 is for it to start in 1 and not 0
+                    new_width=eval(function_string) #varied width
+                    print(f"varied_width: {new_width}")
                 
                 if index==None: #no sequences created
-                    sequence_inst=Sequence(i,self.tag)
-                    print(f"first sequence on{i} created")
-                    sequence_inst.add_pulse(start_time, width,self.delay[0],self.delay[1])
+                    sequence_inst=Sequence(k,self.tag)
+                    print(f"first sequence on{k} created")
+                    sequence_inst.add_pulse(start_time, new_width,self.delay[0],self.delay[1])
 
                     self.Sequence_hub.append(sequence_inst)
                     #sequence_inst.error_adding_pulse.connect(self.error_adding_pulse_channel.emit)
 
                     #error: because when i=1 after i=0 a Sequence is created but it's on sequence_hub[0] thus sequence_hub[1] will be out of range
-                elif self.Sequence_hub[index].iteration==i: #this means there is already a sequence for this iteration
-                    print(f"sequence edited in {i}")
-                    self.Sequence_hub[i].add_pulse(start_time, width,self.delay[0],self.delay[1]) #we add the pulse to the sequence)
+                elif self.Sequence_hub[index].iteration==k: #this means there is already a sequence for this iteration
+                    print(f"sequence edited in {k}")
+                    self.Sequence_hub[k].add_pulse(start_time, new_width,self.delay[0],self.delay[1]) #we add the pulse to the sequence)
                     
            
             self.Sequence_hub = sorted(self.Sequence_hub, key=lambda sequence: sequence.iteration) # Sort (order) the  self.Sequence_hub list by the `iteration` attribute
 
-
-
         else: #meaning we are editing an existing pulse
 
             pass #leave this for later
-
+    def a_experiment(self,i):
+        """ if we find a sequence for the iteration i we return the values if not we return None"""
+        for seq in self.Sequence_hub: 
+            if seq.iteration==i: 
+                return [seq.pb_pulses,seq.pulses]
+        return None
+        
 
 
 

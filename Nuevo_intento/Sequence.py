@@ -14,29 +14,36 @@ class Sequence(QObject): #A sequence per iteration ( 1 frame), QObject allows si
         self.max_end_time_pb=0 # this is the end time of the sequence, it will be used to check if the pulse blaster is ready to send the next sequence
         self.max_end_time=0
     
+
+
+
+    ######   ••••••ADDING A PULSE •••••••
     error_adding_pulse=Signal(str)
     error_signal=Signal()
     def add_pulse(self, start_time,width,delay_on,delay_off): 
         end_tail=start_time+width
         start_tail=start_time
-        pulse=Pulse(start_tail,end_tail) #without delays
+        pulse=Pulse(start_tail,end_tail,self.tag) #without delays
 
         end_tail=start_time+width-delay_off
         start_tail=start_time-delay_on
-        pulse_pb = Pulse(start_tail,end_tail) #with delays
+        pulse_pb = Pulse(start_tail,end_tail,self.tag) #with delays
         
         status = self.check_pulse_fusion(pulse_pb,pulse) #check if the pulse doensnt overlap
         print(f"Fusion?: {status[2]}")
         if status[2]==True: #if there is no overlap with the fixed pulses
-            pulse_pb=Pulse(status[0][0],status[0][1]) #we create a new pulse with the fused intervals
-            pulse=Pulse(status[1][0],status[1][1])
+            pulse_pb=Pulse(status[0][0],status[0][1],self.tag) #we create a new pulse with the fused intervals
+            pulse=Pulse(status[1][0],status[1][1],self.tag)
             self.pb_pulses.append(pulse_pb)
             self.pulses.append(pulse) 
-            print(f"pb_pulses added: {pulse_pb.start_tail} {pulse_pb.end_tail}")
+            print(f"pb_pulses added: {pulse_pb.start_tail}, {pulse_pb.end_tail}")
         else: 
             self.pb_pulses.append(pulse_pb)
             self.pulses.append(pulse) 
             print(f"pb_pulses added: {pulse_pb.start_tail} {pulse_pb.end_tail}")
+        #now we need to sort the pb_pulses by the start tail
+        self.pb_pulses = sorted(self.pb_pulses, key=lambda pb: pb.start_tail) # Sort (order) the  self.pb_pulses list by the `start_tail` attribute
+        self.pulses=sorted(self.pulses, key=lambda pulse: pulse.start_tail)
         for i in range(len(self.pb_pulses)):
             print(f"pb_pulses{i}: [{self.pb_pulses[i].start_tail}, {self.pb_pulses[i].end_tail}]")
 
@@ -155,5 +162,7 @@ class Sequence(QObject): #A sequence per iteration ( 1 frame), QObject allows si
             display_list.append((pulse.pulse_delay, pulse.pulse_width, pulse.pulse_channel_tag))"""
         return display_list
     
-
+    ##### •••••• EXPERIMENT
+    def experiment(self):
+        pass
    
