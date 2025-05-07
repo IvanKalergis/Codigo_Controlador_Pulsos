@@ -17,6 +17,8 @@ import pyqtgraph as pg #para los gráficos de las secuencias
 import numpy as np
 from PySide2.QtCore import QObject , Signal
 
+#import spinapi
+#from spinapi import Inst, LOOP, CONTINUE, END_LOOP, STOP
 
 class PulseManagerLogic(QObject):
 
@@ -111,9 +113,11 @@ class PulseManagerLogic(QObject):
 
 
     def Run_experiment(self,value_loop):
+
         """ here we iterate through each iteration of the loop to find the channels that have a sequence for that iteration 
             then we order the pulses form the channels that have pulses in this iteration. Then we create an object from the  
-            class experiment. which we then add"""
+            class experiment. which we then add to our list Experiment_Hub
+        """
         for i in range(0,value_loop): #we iterate per each iteration of the experiment
             Exp_i_pb=[]
             for channel in self.channels:
@@ -121,8 +125,54 @@ class PulseManagerLogic(QObject):
                 if list_channel_sequence!=None: 
                     Exp_i_pb.append(list_channel_sequence)
             exp=Experiment(Exp_i_pb,i)
-            exp.Run_Exp()
+            exp.Prepare_Exp()
             self.Experiment_Hub.append(exp)  #since we are going from 0-end loop the exp objects will be ordered
+        """ Con la lista Experiment_hub ya completa, flateamos la lista, y luego le enviamos los pulsos a la pulse Blaster """
+        # Flatten all the pulses into one list
+        Flat_exp= [pulse for exp in self.Experiment_Hub for pulse in exp.pb_sequence]
+        ##### Just to check if it's working #######
+
+        self.Send_to_Pulse_Blaster(Flat_exp)
+        
+
+
+
+    def Send_to_Pulse_Blaster(self,Flat_exp):
+        """
+        Here we recieve the flat list with all the pulses, which we then sen to the PB
+        """
+        #spinapi.pb_select_board(0)
+        #if spinapi.pb_init() != 0:
+            #####print("Error initializing board: %s" %pb_get_error())
+            #input("Please press a key to continue.")
+            #exit(-1)
+        #spinapi.pb_reset() 
+        #spinapi.pb_core_clock(500)
+        #spinapi.pb_start_programming(spinapi.PULSE_PROGRAM)
+        #start=spinapi.pb_inst_pbonly(int(sum(Flat_exp[0].channel_binary)),Inst.LOOP,1,(Flat_exp[i].end_tail-Flat_exp[i].start_tail)*spinapi.us)
+        print(f"Flat_exp[0].channel_binary:{Flat_exp[0].channel_binary[0]}")
+        print(f"spinapi.pb_inst_pbonly({sum(Flat_exp[0].channel_binary[0])},Inst.LOOP,{1},({Flat_exp[0].end_tail-Flat_exp[0].start_tail})*spinapi.us)") 
+        for i in range(1,len(Flat_exp)):# we start from one because we already did the 0 index
+            if i!=len(Flat_exp) -1:
+                print(f"spinapi.pb_inst_pbonly({sum(list(Flat_exp[i].channel_binary[0]))},Inst.CONTINUE,0,({Flat_exp[i].end_tail-Flat_exp[i].start_tail})*spinapi.us)")
+                #spinapi.pb_inst_pbonly(int(sum(Flat_exp[i].channel_binary)),Inst.CONTINUE,0,(Flat_exp[i].end_tail-Flat_exp[i].start_tail)*spinapi.us)
+            else:
+                print(f"spinapi.pb_inst_pbonly({sum(list(Flat_exp[i].channel_binary[0]))},Inst.CONTINUE,0,({Flat_exp[i].end_tail-Flat_exp[i].start_tail})*spinapi.us)")
+                #spinapi.pb_inst_pbonly(int(sum(Flat_exp[i].channel_binary)),Inst.CONTINUE,0,(Flat_exp[i].end_tail-Flat_exp[i].start_tail)*spinapi.us)
+                print(f"spinapi.pb_inst_pbonly({sum(list(Flat_exp[i].channel_binary[0]))},Inst.END_LOOP,start,{Flat_exp[i].end_tail-Flat_exp[i].start_tail}")
+                #spinapi.pb_inst_pbonly(int(sum(Flat_exp[i].channel_binary)),Inst.END_LOOP,start,Flat_exp[i].end_tail-Flat_exp[i].start_tail)
+        #spinapi.pb_inst_pbonly(int(0),Inst.STOP,0,1*spinapi.us) # This instruction stops the pulse sequence. The duration is set to a very small value to ensure the stop instruction is executed almost immediately.
+        print(f"spinapi.pb_inst_pbonly(int(0),Inst.STOP,0,0.01*spinapi.us)")
+        #spinapi.pb_stop_programming()  # This function call signals the end of programming the pulse sequence. It tells the SpinAPI library that the sequence definition is complete and the pulse program can be finalized
+        print(f"spinapi.pb_stop_programming()")
+        #spinapi.pb_reset() 
+        #spinapi.pb_start()
+
+        
+        pass
+
+        
+
             
 
 

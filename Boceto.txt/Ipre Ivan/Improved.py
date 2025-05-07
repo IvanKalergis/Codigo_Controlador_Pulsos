@@ -13,33 +13,33 @@ from PySide2.QtWidgets import (
 from PySide2.QtGui import QPen,QColor
 import pyqtgraph as pg #para los gráficos de las secuencias
 import numpy as np
-from PySide2.QtCore import QObject , Signal
+from Sequence import Ui_Form  # Assuming the UI class is named Ui_MainWindow
+import os 
+os.environ["QT_MAC_WANTS_LAYER"] = "1" # This is needed for macOS Mojave and later
 
-
-class Logic(QObject):
-    
-
-    sequence_signals=Signal(pg.PlotDataItem)  # Define a Signal that emits the corresponding plot to the gui doc
-    adding_list_signal=Signal(str)
-    print_stuff=Signal(list)
-    clearing_graph_signal=Signal()
-    sequence_signals=Signal(pg.PlotDataItem)
-    Pulse_i=Signal(str)
-    iteration_j=Signal(str)
-    itera_list=Signal(str)
-    clear_simulation_graph=Signal()
-    add_iteration_txt=Signal(str)
-    add_simulation_graph=Signal(pg.PlotDataItem)
-    duration_signal=Signal(str)
-
-
-    def __init__(self, parent=None):
-        super(Logic, self).__init__()
-        self.parent = parent  # Store the parent widget
+class Window(QWidget,Ui_Form):
+    def __init__(self):
+        super(Window, self).__init__()
+        self.ui = Ui_Form() # initializes the UI form
+        self.ui.setupUi(self)
+        ## now lets go over the functionality
+        self.ui.Add_Channel.clicked.connect(self.respect_simulation_Channel)
+        self.ui.Clear_Channels.clicked.connect(self.clear_list)
+        self.ui.Delay_ON.setMaximum(1000000)  # Set to a large number as needed
+        self.ui.Delay_ON.setMinimum(0)  
+        self.ui.Delay_OFF.setMaximum(1000000)
+        self.ui.Delay_OFF.setMinimum(0)
+        self.ui.StartTime.setMaximum(1000000)
+        self.ui.StartTime.setMinimum(0) 
+        self.ui.Puls_Width.setMaximum(1000000)
+        self.ui.Puls_Width.setMinimum(0)
         self.Delays_channel=[] # [[channel,[delay_on,delay_off]],[channel,[delay_on,delay_off]]  ]
         self.added_channels = []  # Set to keep track of added channels
         self.channel_labels=[] #[[channel, label],[channel, label]]
         self.added_flags=[]
+        self.ui.Add_Pulse.clicked.connect(self.respect_simulation_Pulses)
+        self.ui.Puls_Width.setMinimum(1)
+        #FOR THE SEQUENCE, FIXED PULSES, AND REPRESENTATION
         self.pb_pulses=[] # here we keep all the pulses added from all the channels,adjusted for the delays, this is for the pulse blaster
         self.Sequence_Pulses=[] #this is the sequence that will be used for the graph, it shows the intended intervals
         self.green_list=[]
@@ -53,6 +53,22 @@ class Logic(QObject):
         self.micro_list=[]
         self.micro_list_pb=[]
         self.final_result=[]
+        self.ui.Run_Sequence.clicked.connect(self.Run_experiment)
+        self.ui.Remove_Channel.clicked.connect(self.remove_channel)
+        #FOR VARIATIONS IN ITERATIONS
+        self.ui.Iterations_start.setMaximum(1000000)
+        self.ui.Iterations_start.setMinimum(0) 
+        self.ui.Iterations_end.setMaximum(1000000)
+        self.ui.Iterations_end.setMinimum(self.ui.Iterations_start.value()+1) 
+        self.ui.Iterations_start.valueChanged.connect(self.set_max)
+        self.ui.Channel_Pulse.currentTextChanged.connect(self.show_varying_pulses)#when selecting a channel on the self.ui.Channel_Pulse
+        self.ui.Add_Channel.clicked.connect(self.show_varying_pulses) # when adding a new channel to the sequence 
+        self.ui.Add_Pulse.clicked.connect(self.show_varying_pulses) #when adding a new channel to the sequence
+        self.Max_end_no_iter=[] #should be like[ [channel,[pulse,end_time]],[channel,[pulse,end]]]
+        ###SIMULATION
+        #now for when we add specific conditions for a pulse
+        self.ui.Add_Change.clicked.connect(self.respect_simulation_Change_Pulse)
+        #first we need to create a global variable which keeps the channel, the pulse, and each iteration range[ [2,[1,[5,9], [14,20]],[3,[[5,9], [14,20]]]]
         self.Channel_Pulse_iter=[]# this is only to check for iteration overlap
         self.All_List=[] # [ [channe,[,],[,]], [channle,[,],[,]] ] ordered Pb pulses
         self.Max_end_type=[] #[ [channel,[pulse,[type,max_end]]], [channel,.....]] ### this only save the max end time with iterations
@@ -60,61 +76,118 @@ class Logic(QObject):
         self.Iteration_All=[] # of intended pulses [[channel, [pulse,[type,[iter],start,[results]]]]], this will be used specifically for the simulation
         self.Start_Results=[]# a list that serves a value holder each time there is a variatin added, to give the values of startn and the result to self.Iteration_ALl
         self.Global_end_time=0#the largest time value for the sequence delayed one element is including the delay, and the other is the time intended by the user, we need to change this to not include the delays
+        self.ui.ms.setMaximum(1000000)
+        self.ui.ms.setMinimum(1)
+        self.ui.ms.setValue(500) # a normal speed
+        self.ui.Update.clicked.connect(self.simulation)
         self.iteration = 0
-         ######## for the PBlaster:
-        self.Iteration_All_PB=[]#[ [channel,[pulse,[type,start,[iter],results_width],[type,start,[iter],results] ] ]]
+        self.ui.Loop_Sequence.setValue(1)
+        self.ui.Stop_Simulation.clicked.connect(self.stop_simulation)
+        self.ui.Loop_Sequence.valueChanged.connect(self.calculate_Loop_Duration)
+        ######## for the PBlaster:
+        self.Iteration_All_PB=[]
         self.All_List_PB=[]
         #######
         self.PULSE_BLASTER=[]
-        self.Max_end_no_iter=[] #should be like[ [channel,[pulse,end_time]],[channel,[pulse,end]]]
-        pass
-
-    def respect_simulation_Channel(self,delay_on, delay_off,channel,channel_label): #we only allow the addition of the channel once the simulation has already runnes, to avoid errors
+        
+    
+    def respect_simulation_Pulses(self): #we only allow the addition of the pulse once the simulation has already runnes, to avoid errors
         if self.iteration==0:
-            self.Add_to_List(delay_on, delay_off,channel,channel_label)
+            #print("allowed to add a pulse")
+            self.Added_Pulses()
+            self.calculate_Loop_Duration()
+            #print(f"duration:{self.duration}")
+        else:
+            dlg = QMessageBox(self)
+            dlg.setWindowTitle("Error!")
+            dlg.setText(f"End simulation before adding a new pulse")
+            dlg.setStandardButtons(QMessageBox.Ok)
+            dlg.exec_()
+        #print(f"All_List: {self.All_List)}")
+        #print(f"max_end_type: {self.Max_end_type}")
+        #print(f"Channel_Pulse_iter: {self.Channel_Pulse_iter}")
+        #print(f"max_end_no_iter:{self.Max_end_no_iter}")
+    def respect_simulation_Channel(self): #we only allow the addition of the channel once the simulation has already runnes, to avoid errors
+        if self.iteration==0:
+            self.Add_to_List()
             print("allowed to add a channel")
         else:
-            dlg = QMessageBox(self.parent)
+            dlg = QMessageBox(self)
             dlg.setWindowTitle("Error!")
             dlg.setText(f"End simulation before adding new channel")
             dlg.setStandardButtons(QMessageBox.Ok)
             dlg.exec_()
+    def respect_simulation_Change_Pulse(self): #we only allow the addition of the channel once the simulation has already runnes, to avoid errors
+        if self.iteration==0:
+            print("allowed to vary pulse width")
+            self.add_varying_pulse_width()
+            self.calculate_Loop_Duration()
+            print(f"duration:{self.duration}")
+        else:
+            dlg = QMessageBox(self)
+            dlg.setWindowTitle("Error!")
+            dlg.setText(f"End simulation before changing pulse width")
+            dlg.setStandardButtons(QMessageBox.Ok)
+            dlg.exec_()
+        #print(f"All_List: {self.pulses_ordered_by_time_channels()}")
+        #print(f"max_end_type: {self.Max_end_type}")
+        #print(f"Channel_Pulse_iter: {self.Channel_Pulse_iter}")
+        #print(f"max_end_no_iter:{self.Max_end_no_iter}")
+    def set_max(self): # as soon as I change the value fo the Iteration_start, the Iteration _end, allow numbers bigger than the Iterations_start
+            self.ui.Iterations_end.setMinimum(self.ui.Iterations_start.value()+1) 
+            pass  
 
-    def Add_to_List(self,channel,delay_on, delay_off,channel_label): #we add the channels to the list
-        channel=int(channel)
-        flag=[channel,delay_on,delay_off,channel_label]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    def Added_Channel(self):
+        channel = self.ui.Channel_Identifier.currentIndex()
+        delay_on = self.ui.Delay_ON.value()
+        delay_off = self.ui.Delay_OFF.value()
+        channel_label = self.ui.Type_Channel.text()#we get the label of the channel from the gui
+        channel_label=channel_label.lower() #we leave it undercase
+        flag= [channel,delay_on,delay_off,channel_label]
+        return flag
+    def Add_to_List(self): #we add the channels to the list
+        flag = self.Added_Channel()
         Label_recognized=True #we assume fisrt that the lable is either green, or yellow or red or ...
-        lista=self.added_channels
-        if channel not in lista:  # Check if channel is already added, #flag[0]
+        if flag[0] not in self.added_channels:  # Check if channel is already added
             #  This is for the Graphs in the Sequence Plot
-            if channel_label=="green":
+            if self.ui.Type_Channel.text().lower()=="green":
                 self.green_sequence = pg.PlotDataItem( [0, 100, 200, 300],[5, 5, 5, 5], pen={'color': (44, 160, 44), 'width': 1.5})
-                self.sequence_signals.emit(self.green_sequence)
-                #self.ui.Sequence_Diagram.addItem(self.green_sequence)
+                self.ui.Sequence_Diagram.addItem(self.green_sequence)
                 pass
-            elif channel_label=="yellow":
+            elif self.ui.Type_Channel.text().lower()=="yellow":
                 self.yellow_sequence = pg.PlotDataItem([0, 100, 200, 300], [15, 15, 15, 15], pen={'color': (254, 198, 21), 'width': 1.5})
-                self.sequence_signals.emit(self.yellow_sequence)
-                #self.ui.Sequence_Diagram.addItem(self.yellow_sequence)
+                self.ui.Sequence_Diagram.addItem(self.yellow_sequence)
                 pass
-            elif channel_label=="red":
+            elif self.ui.Type_Channel.text().lower()=="red":
                 self.red_sequence = pg.PlotDataItem([0, 100, 200, 300], [25, 25, 25, 25], pen={'color': (214, 39, 40), 'width': 1.5})
-                self.sequence_signals.emit(self.red_sequence)
-                #self.ui.Sequence_Diagram.addItem(self.red_sequence)
+                self.ui.Sequence_Diagram.addItem(self.red_sequence)
                 pass
-            elif channel_label=="apd":
+            elif self.ui.Type_Channel.text().lower()=="apd":
                 self.apd_sequence = pg.PlotDataItem([0, 100, 200, 300], [35, 35, 35, 35], pen={'color': (250, 250, 250), 'width': 1.5})
-                self.sequence_signals.emit(self.apd_sequence)
-                #self.ui.Sequence_Diagram.addItem(self.apd_sequence)
+                self.ui.Sequence_Diagram.addItem(self.apd_sequence)
                 pass
-            elif channel_label=="microwave":
+            elif self.ui.Type_Channel.text().lower()=="microwave":
                 self.micro_sequence = pg.PlotDataItem([0, 100, 200, 300], [45, 45, 45, 45], pen={'color': (128, 0, 128), 'width': 1.5})
-                self.sequence_signals.emit(self.micro_sequence)
-                #self.ui.Sequence_Diagram.addItem(self.micro_sequence)
+                self.ui.Sequence_Diagram.addItem(self.micro_sequence)
                 pass
             else: 
                 Label_recognized=False
-                dlg = QMessageBox(self.parent)
+                dlg = QMessageBox(self)
                 dlg.setWindowTitle("Error!")
                 dlg.setText(f"Label not Recognized, must be either Green, Yellow, Red, Apd, or Microwave")
                 dlg.setStandardButtons(QMessageBox.Ok)
@@ -122,8 +195,7 @@ class Logic(QObject):
 
             if Label_recognized==True:
                 flag_str = f"channel: {flag[0]}, delay_on: {abs(flag[1])}, delay_off: {abs(flag[2])}, {flag[3]}"  # Convert list to string
-                self.adding_list_signal.emit(flag_str)
-                #self.ui.Channel_List.addItem(flag_str) #we add the chanel with its protpertie to the list
+                self.ui.Channel_List.addItem(flag_str) #we add the chanel with its protpertie to the list
                 self.added_channels.append(flag[0]) #add channel to the set
                 self.channel_labels.append([flag[0],flag[3]]) ##[[channel, label],[channel, label]] this will be used in update sequence and in remove channel
                 self.added_flags.append(flag)
@@ -151,58 +223,26 @@ class Logic(QObject):
                     self.Max_end_no_iter.append([flag[0]])
                     #print(f"iteration_list_saving:{self.iteration_list_saving}")
         else: 
-            dlg = QMessageBox(self.parent)
+            dlg = QMessageBox(self)
             dlg.setWindowTitle("Error!")
             dlg.setText(f"Channel {flag[0]} already added")
             dlg.setStandardButtons(QMessageBox.Ok)
             dlg.exec_()
         return flag
 
-    def respect_simulation_Pulses(self,channel,start_time,width,max_counter): #we only allow the addition of the pulse once the simulation has already runnes, to avoid errors
-        if self.iteration==0:
-            #print("allowed to add a pulse")
-            self.Added_Pulses(channel,start_time,width)
-            self.calculate_Loop_Duration(max_counter)
-            #print(f"duration:{self.duration}")
-        else:
-            dlg = QMessageBox(self.parent)
-            dlg.setWindowTitle("Error!")
-            dlg.setText(f"End simulation before adding a new pulse")
-            dlg.setStandardButtons(QMessageBox.Ok)
-            dlg.exec_()
-            #print(f"All_List: {self.All_List)}")
-            #print(f"max_end_type: {self.Max_end_type}")
-            #print(f"Channel_Pulse_iter: {self.Channel_Pulse_iter}")
-            #print(f"max_end_no_iter:{self.Max_end_no_iter}")
 
-    def respect_simulation_Change_Pulse(self,pulse_flag,pulse_box_count,channel_index_box,current_pulse,max_counter): #we only allow the addition of the channel once the simulation has already runnes, to avoid errors
-        if self.iteration==0:
-            print("allowed to vary pulse width")
-            self.add_varying_pulse_width(pulse_flag,pulse_box_count,channel_index_box,current_pulse)
-            self.calculate_Loop_Duration(max_counter)
-            print(f"duration:{self.duration}")
-        else:
-            dlg = QMessageBox(self.parent)
-            dlg.setWindowTitle("Error!")
-            dlg.setText(f"End simulation before changing pulse width")
-            dlg.setStandardButtons(QMessageBox.Ok)
-            dlg.exec_()
-        #print(f"All_List: {self.pulses_ordered_by_time_channels()}")
-        #print(f"max_end_type: {self.Max_end_type}")
-        #print(f"Channel_Pulse_iter: {self.Channel_Pulse_iter}")
-        #print(f"max_end_no_iter:{self.Max_end_no_iter}")
-
-    def Added_Pulses(self,channel,start_time,width):
-        channel=channel #the value of the channel
+    
+    def Added_Pulses(self):
+        channel=self.ui.Channel_Pulse.currentIndex() #the value of the channel
         if len(self.added_channels)==0:
-            dlg = QMessageBox(self.parent)
+            dlg = QMessageBox(self)
             dlg.setWindowTitle("Error!")
             dlg.setText("No channels added")
             dlg.setStandardButtons(QMessageBox.Ok)
             dlg.exec_()
             return
         elif channel not in self.added_channels:
-            dlg = QMessageBox(self.parent)
+            dlg = QMessageBox(self)
             dlg.setWindowTitle("Error!")
             dlg.setText(f"Channel {channel} not added")
             dlg.setStandardButtons(QMessageBox.Ok)
@@ -219,8 +259,8 @@ class Logic(QObject):
                     delay_off=self.added_flags[i][2]
                     channel_label=self.added_flags[i][3]     
             #we need to adjust the intervals to account for the delays 
-            start_time= start_time
-            width= width
+            start_time= self.ui.StartTime.value()
+            width= self.ui.Puls_Width.value() #Pulse_Width
             #including the delays
             end_tail=start_time+width-delay_off
             start_tail=start_time-delay_on
@@ -256,7 +296,6 @@ class Logic(QObject):
                         index_max_end_channel=self.find_indices_first_terms(self.Max_end_type, int(channel))
                         if self.contains_sublists(self.Max_end_type)== True: # to check if there are actual variations of iterations in the respective channel
                             self.All_List=self.pulses_ordered_by_time_channels()  
-                            print(f"All_List: {self.All_List}")
                             self.All_List_PB=self.pulses_ordered_by_time_channels_pb() 
                             #print(f"All_List_PB: {self.All_List_PB}")
                             #print(f"All_List{self.All_List}")
@@ -298,13 +337,13 @@ class Logic(QObject):
                                                     overlap_variations_pulses=True
     
                     if overlap_fixed_pulses==True: 
-                        dlg = QMessageBox(self.parent)
+                        dlg = QMessageBox(self)
                         dlg.setWindowTitle("Error!")
                         dlg.setText(f"Overlapping pulses in channel {channel}")
                         dlg.setStandardButtons(QMessageBox.Ok)
                         dlg.exec_() 
                     elif overlap_variations_pulses==True:
-                        dlg = QMessageBox(self.parent)
+                        dlg = QMessageBox(self)
                         dlg.setWindowTitle("Error!")
                         dlg.setText(f"Overlapping pulses in channel {channel}, due to the increasing iteration on pulse: {Previous_Pulse}")
                         dlg.setStandardButtons(QMessageBox.Ok)
@@ -427,13 +466,13 @@ class Logic(QObject):
                         #print(f"Channel_Pulse_iter: {self.Channel_Pulse_iter}")
 
             elif Adjusted_Interval[0]<0: #if runned the interval fails to start after cero, and gives negative time which is not allowed
-                dlg = QMessageBox(self.parent)
+                dlg = QMessageBox(self)
                 dlg.setWindowTitle("Error!")
                 dlg.setText(f"Adjusting for the delay, gives negative start_time of {Adjusted_Interval[0]} ")
                 dlg.setStandardButtons(QMessageBox.Ok)
                 dlg.exec_()
             else:
-                dlg = QMessageBox(self.parent)
+                dlg = QMessageBox(self)
                 dlg.setWindowTitle("Error!")
                 dlg.setText(f"cannot adjust for the delay because width={width}<={delay_off}=delay_off")
                 dlg.setStandardButtons(QMessageBox.Ok)
@@ -453,9 +492,12 @@ class Logic(QObject):
         #print(f"pb_pulses: {self.pb_pulses}")    
         return [self.pb_pulses] # this is the sequence that will be used for the pulse blaster
 
+
+
+
+
     def update_graph_sequence(self): # each time we add a pulse, the sequence on the  gets updated on 
-        self.clearing_graph_signal.emit() #we send the signal to the gui doc to clear the graph
-        #self.ui.Sequence_Diagram.clear() # to reset to cero 
+        self.ui.Sequence_Diagram.clear() # to reset to cero 
         All_labels=[] #a list that will keep all labels which have a pulse
         self.green_list=[] #the pulse intervals of the green laser
         self.yellow_list=[]
@@ -531,28 +573,27 @@ class Logic(QObject):
                 # Create a dashed pen for the pb pulses
                 y_green_pb=np.array([ 10 if any(start <= x < end for start, end in green_ordered_int_pb) else 5 for x in np.arange(0, max_end_time, 1)]) 
                 x_green_pb=np.linspace(0, max_end_time, len(y_green_pb) + 1)
-                self.green_sequence_pb = pg.PlotDataItem(x_green_pb, y_green_pb, stepMode='center', pen={'color':(80, 80, 80),'width': 1.5})  # stepMode allows us to graph with vertical lines
-                self.sequence_signals.emit(self.green_sequence_pb)
-                #self.ui.Sequence_Diagram.addItem(self.green_sequence_pb)
+                dashed_pen = QPen(QColor(80, 80, 80), 0.02, Qt.DashLine)  # Dark gray color
+                dashed_pen.setDashPattern([4, 2])  # Custom dash pattern: 4 pixels on, 2 pixels off
+                self.green_sequence_pb = pg.PlotDataItem(x_green_pb, y_green_pb, stepMode='center', pen=dashed_pen)  # stepMode allows us to graph with vertical lines
+                self.ui.Sequence_Diagram.addItem(self.green_sequence_pb)
                 #we add the intended values at the graph
                 y_green=np.array([ 10 if any(start <= x < end for start, end in green_ordered_int) else 5 for x in np.arange(0, max_end_time, 1)]) 
                 x_green=np.linspace(0, max_end_time, len(y_green) + 1)# when using stepMode='center' in pyqtgraph, the length of the x array must be equal to the length of the y array plus one. This requirement ensures that each step has a starting and ending x-coordinate.
                 self.green_sequence = pg.PlotDataItem(x_green, y_green, stepMode='center',pen={'color': (44, 160, 44), 'width': 1.5}) # stepmpde allows us to graph with vertical lines
-                self.sequence_signals.emit(self.green_sequence)
-                #self.ui.Sequence_Diagram.addItem(self.green_sequence)
+                self.ui.Sequence_Diagram.addItem(self.green_sequence)
                 #print(f"ygreen={y_green}")
                 #print(f"ygreen={y_green}")
             elif "yellow"==item.lower():
                 y_yellow_pb=np.array([ 20 if any(start <= x < end for start, end in yellow_ordered_int_pb) else 15 for x in np.arange(0, max_end_time, 1)]) 
                 x_yellow_pb=np.linspace(0, max_end_time, len(y_yellow_pb) + 1)
-                self.yellow_sequence_pb = pg.PlotDataItem(x_yellow_pb, y_yellow_pb, stepMode='center',pen={'color':(80, 80, 80),'width': 1.5})  # stepMode allows us to graph with vertical lines
-                self.sequence_signals.emit(self.yellow_sequence_pb)
-                #self.ui.Sequence_Diagram.addItem(self.yellow_sequence_pb)
+                dashed_pen = QPen(QColor(80, 80, 80), 0.02, Qt.DashLine)  # Dark gray color
+                self.yellow_sequence_pb = pg.PlotDataItem(x_yellow_pb, y_yellow_pb, stepMode='center', pen=dashed_pen)  # stepMode allows us to graph with vertical lines
+                self.ui.Sequence_Diagram.addItem(self.yellow_sequence_pb)
                 y_yellow=np.array([ 20 if any(start <= x < end for start, end in yellow_ordered_int) else 15 for x in np.arange(0, max_end_time, 1)])
                 x_yellow=np.linspace(0, max_end_time, len(y_yellow) + 1)
                 self.yellow_sequence = pg.PlotDataItem(x_yellow, y_yellow, stepMode='center',pen={'color': (254, 198, 21), 'width': 1.5})
-                self.sequence_signals.emit(self.yellow_sequence)
-                #self.ui.Sequence_Diagram.addItem(self.yellow_sequence)
+                self.ui.Sequence_Diagram.addItem(self.yellow_sequence)
                 #print("yellow ordered int 2")
                 #print(f"y_yellow: {y_yellow}")
                 #print(f"x_yellow {x_yellow}")
@@ -560,94 +601,95 @@ class Logic(QObject):
             elif "red"==item.lower():
                 y_red_pb=np.array([ 30 if any(start <= x < end for start, end in red_ordered_int_pb) else 25 for x in np.arange(0, max_end_time, 1)]) 
                 x_red_pb=np.linspace(0, max_end_time, len(y_red_pb) + 1)
-                self.red_sequence_pb = pg.PlotDataItem(x_red_pb, y_red_pb, stepMode='center', pen={'color':(80, 80, 80),'width': 1.5})  # stepMode allows us to graph with vertical lines
-                self.sequence_signals.emit(self.red_sequence_pb)
-                #self.ui.Sequence_Diagram.addItem(self.red_sequence_pb)
+                dashed_pen = QPen(QColor(80, 80, 80), 0.02, Qt.DashLine)  # Dark gray color
+                self.red_sequence_pb = pg.PlotDataItem(x_red_pb, y_red_pb, stepMode='center', pen=dashed_pen)  # stepMode allows us to graph with vertical lines
+                self.ui.Sequence_Diagram.addItem(self.red_sequence_pb)
                 y_red=np.array([ 30 if any(start <= x < end for start, end in red_ordered_int) else 25 for x in np.arange(0, max_end_time, 1)])
                 x_red=np.linspace(0, max_end_time, len(y_red) + 1)
                 self.red_sequence = pg.PlotDataItem(x_red, y_red,stepMode='center', pen={'color': (214, 39, 40), 'width': 1.5})
-                self.sequence_signals.emit(self.red_sequence)
-                #self.ui.Sequence_Diagram.addItem(self.red_sequence)
+                self.ui.Sequence_Diagram.addItem(self.red_sequence)
 
             elif "apd"== item.lower():
                 y_apd_pb=np.array([ 40 if any(start <= x < end for start, end in apd_ordered_int_pb) else 35 for x in np.arange(0, max_end_time, 1)]) 
                 x_apd_pb=np.linspace(0, max_end_time, len(y_apd_pb) + 1)
-                self.apd_sequence_pb = pg.PlotDataItem(x_apd_pb, y_apd_pb, stepMode='center', pen={'color':(80, 80, 80),'width': 1.5})  # stepMode allows us to graph with vertical lines
-                self.sequence_signals.emit(self.apd_sequence_pb)
-                #self.ui.Sequence_Diagram.addItem(self.apd_sequence_pb)
+                dashed_pen = QPen(QColor(80, 80, 80), 0.02, Qt.DashLine)  # Dark gray color
+                self.apd_sequence_pb = pg.PlotDataItem(x_apd_pb, y_apd_pb, stepMode='center', pen=dashed_pen)  # stepMode allows us to graph with vertical lines
+                self.ui.Sequence_Diagram.addItem(self.apd_sequence_pb)
                 y_apd=np.array([ 40 if any(start <= x < end for start, end in apd_ordered_int) else 35 for x in np.arange(0, max_end_time, 1)])
                 x_apd=np.linspace(0, max_end_time, len(y_apd) + 1)
                 self.apd_sequence = pg.PlotDataItem(x_apd, y_apd, stepMode='center', pen={'color': (250, 250, 250), 'width': 1.5})
-                self.sequence_signals.emit(self.apd_sequence)
-                #self.ui.Sequence_Diagram.addItem(self.apd_sequence)
+                self.ui.Sequence_Diagram.addItem(self.apd_sequence)
 
             elif "microwave" ==item.lower():
                 y_micro_pb=np.array([ 50 if any(start <= x < end for start, end in micro_ordered_int_pb) else 45 for x in np.arange(0, max_end_time, 1)]) 
                 x_micro_pb=np.linspace(0, max_end_time, len(y_micro_pb) + 1)
-                self.micro_sequence_pb = pg.PlotDataItem(x_micro_pb, y_micro_pb, stepMode='center', pen={'color':(80, 80, 80),'width': 1.5})  # stepMode allows us to graph with vertical lines
-                self.sequence_signals.emit(self.micro_sequence_pb)
-                #self.ui.Sequence_Diagram.addItem(self.micro_sequence_pb)
+                dashed_pen = QPen(QColor(80, 80, 80), 0.02, Qt.DashLine)  # Dark gray color
+                self.micro_sequence_pb = pg.PlotDataItem(x_micro_pb, y_micro_pb, stepMode='center', pen=dashed_pen)  # stepMode allows us to graph with vertical lines
+                self.ui.Sequence_Diagram.addItem(self.micro_sequence_pb)
                 y_micro=np.array([ 50 if any(start <= x < end for start, end in micro_ordered_int)else 45 for x in np.arange(0, max_end_time, 1)])
                 x_micro=np.linspace(0, max_end_time, len(y_micro) + 1)
                 self.micro_sequence = pg.PlotDataItem(x_micro, y_micro,stepMode='center', pen={'color': (128, 0, 128), 'width': 1.5})
-                self.sequence_signals.emit(self.micro_sequence)
-                #self.ui.Sequence_Diagram.addItem(self.micro_sequence)
+                self.ui.Sequence_Diagram.addItem(self.micro_sequence)
         
-    def show_varying_pulses(self, channel_pulse_index): #when we change the channel on our self.ui.Channel.Pulse, we get our pulses per channel in our pUlses_Box
-        #self.ui.Pulses_box.clear() #as soon as the Channel_box changes the pulse box is cleared and add the pulses for the respective. 
-        #self.ui.Iteration_list.clear()
+    
+
+
+
+
+
+
+    
+    def show_varying_pulses(self): #when we change the channel on our self.ui.Channel.Pulse, we get our pulses per channel in our pUlses_Box
+        self.ui.Pulses_box.clear() #as soon as the Channel_box changes the pulse box is cleared and add the pulses for the respective. 
+        self.ui.Iteration_list.clear()
         if self.Sequence_Pulses!=[]:
-            index_respective_pulse=self.find_indices_first_terms(self.Sequence_Pulses, channel_pulse_index)
+            index_respective_pulse=self.find_indices_first_terms(self.Sequence_Pulses, self.ui.Channel_Pulse.currentIndex())
             if index_respective_pulse!= None: 
                 #print(f"current index: {self.ui.Channel_Pulse.currentIndex()}")
                 #print(f"index_respective_pulse:{index_respective_pulse}")
                 n_pulses=len(self.Sequence_Pulses[index_respective_pulse])-1 #we get the number of pulses by counting the  intervals and discount one because the firs element is the channel, not  an interval 
                 if n_pulses>0:
-                    PulseBox=[]
                     for i in range(n_pulses):
-                        #PulseBox.append(f"Pulse:{i+1}")
-                        #self.ui.Pulses_box.addItem(f"Pulse:{i+1}") # we add the pulse to the pulse combobox for the corresponding channels
-                        self.Pulse_i.emit(f"Pulse:{i+1}")
-                    iteration_list=[]
-                    for j in range(len(self.iteration_list_saving[index_respective_pulse])):
+                        self.ui.Pulses_box.addItem(f"Pulse:{i+1}") # we add the pulse to the pulse combobox for the corresponding channels
+                    for j in range(len(self.iteration_list_saving[index_respective_pulse]))   :
                         if len(self.iteration_list_saving[index_respective_pulse])>1:
                             if j>0:
                                 #print(f"j: {j}")
                                 #print(f"len(Iteration_list)): {len(self.iteration_list_saving[index_respective_pulse])}")
-                                #iteration_list.append(str(self.iteration_list_saving[index_respective_pulse][j]))
-                                self.iteration_j.emit(str(self.iteration_list_saving[index_respective_pulse][j]))
-                                #self.ui.Iteration_list.addItem(str(self.iteration_list_saving[index_respective_pulse][j])) # we add the flags again to the list 
+                                self.ui.Iteration_list.addItem(str(self.iteration_list_saving[index_respective_pulse][j])) # we add the flags again to the list 
                             pass #print(f"iteration_list_saving:{self.iteration_list_saving}")
         pass
 
-    def add_varying_pulse_width(self,pulse_flag,pulse_box_count, channel_index_box,current_pulse):
+    
+    def add_varying_pulse_width(self):
         # we save the pulse, the type, the function, the iteration range
+        pulse_flag=[self.ui.Pulses_box.currentText(), self.ui.Type_Change.currentIndex(), self.ui.Function.text(),[self.ui.Iterations_start.value(),self.ui.Iterations_end.value()]]
         #print(f" self.ui.Type_Change.currentIndex(): { self.ui.Type_Change.currentIndex()}")
         pulse_flag_str=f"{pulse_flag[0]}, type: {pulse_flag[1]}, function: {pulse_flag[2]}, iteration range: {pulse_flag[3]}"
-        if pulse_box_count==0: #meaning the combobox doesnt have pulses, the channel doesnt have  pulses
-            dlg = QMessageBox(self.parent)
+        if self.ui.Pulses_box.count()==0: #meaning the combobox doesnt have pulses, the channel doesnt have  pulses
+            dlg = QMessageBox(self)
             dlg.setWindowTitle("Error!")
             dlg.setText("No pulses added in this channel")
             dlg.setStandardButtons(QMessageBox.Ok)
             dlg.exec_()
         #lets receive the function
         elif 'i' not in pulse_flag[2] or 'W' not in pulse_flag[2]:
-            dlg = QMessageBox(self.parent)
+            dlg = QMessageBox(self)
             dlg.setWindowTitle("Error!")
             dlg.setText("Must include these two variables: i and W")
             dlg.setStandardButtons(QMessageBox.Ok)
             dlg.exec_()
-        elif channel_index_box not in self.added_channels:
-            dlg = QMessageBox(self.parent)
+        elif self.ui.Channel_Pulse.currentIndex() not in self.added_channels:
+            dlg = QMessageBox(self)
             dlg.setWindowTitle("Error!")
-            dlg.setText(f"Channel {channel_index_box} not added")
+            dlg.setText(f"Channel {self.ui.Channel_Pulse.currentIndex()} not added")
             dlg.setStandardButtons(QMessageBox.Ok)
             dlg.exec_()
         else:
-            index_channel_iter=self.find_indices_first_terms(self.Channel_Pulse_iter,channel_index_box) #we get the index of the list were the current channel is
-            index_channel=self.find_indices_first_terms(self.All_List_PB,channel_index_box) # we find the index for the channel, and we use All_list because we want our pulses to be ordered by time in our combobox
+            index_channel_iter=self.find_indices_first_terms(self.Channel_Pulse_iter,self.ui.Channel_Pulse.currentIndex()) #we get the index of the list were the current channel is
+            index_channel=self.find_indices_first_terms(self.All_List_PB,self.ui.Channel_Pulse.currentIndex()) # we find the index for the channel, and we use All_list because we want our pulses to be ordered by time in our combobox
             #print(f"index_channel: {index_channel}")
-            current_pulse=current_pulse + 1 #we add one for the first pulse to start at one and not at 0. this pulses are not ordered in time
+            current_pulse=self.ui.Pulses_box.currentIndex() + 1 #we add one for the first pulse to start at one and not at 0. this pulses are not ordered in time
             #print(f"current_pulse: {current_pulse}")
             if len(self.Channel_Pulse_iter[index_channel_iter][current_pulse])==1: #[ [channel,[pulse,[iter],[iter]] if the respective pulse has no iter
                 #print(f"first iter added to pulse ")
@@ -658,7 +700,7 @@ class Logic(QObject):
                 result_iterations= self.Overlapping_iterations(index_channel_iter,pulse_flag,current_pulse)
                 if result_iterations[0]==True:#if iterations overlap
                     overlap_iter=True
-                    dlg = QMessageBox(self.parent)
+                    dlg = QMessageBox(self)
                     dlg.setWindowTitle("Error!")
                     dlg.setText(f"Iteration range: {pulse_flag[3]} overlaps with {self.Overlapping_iterations(index_channel_iter,pulse_flag,current_pulse)[1]}")
                     dlg.setStandardButtons(QMessageBox.Ok)
@@ -667,10 +709,10 @@ class Logic(QObject):
                     overlap_iter=False
             
             if overlap_iter==False: 
-                result=self.Overlapping_Pulses(index_channel,pulse_flag,current_pulse,channel_index_box)
+                result=self.Overlapping_Pulses(index_channel,pulse_flag,current_pulse)
                 #print(f"result_pulses:{result}")
                 if result[0]==True: #meaning its overlapping
-                    dlg = QMessageBox(self.parent)
+                    dlg = QMessageBox(self)
                     dlg.setWindowTitle("Error!")
                     dlg.setText(f"Pulse overlaps on the {result[1]} iteration")
                     dlg.setStandardButtons(QMessageBox.Ok)
@@ -678,21 +720,24 @@ class Logic(QObject):
                 else: 
                     #print("variation pulses dont overlap")
                     self.Channel_Pulse_iter[index_channel_iter][ current_pulse].append(pulse_flag[3]) # we add the iterations to the list [ [channel,[pulse,[iter],[iter]]
-                    #self.ui.Iteration_list.addItem(pulse_flag_str)
-                    self.itera_list.emit(pulse_flag_str)
-                    self.Iteration_All[index_channel_iter][current_pulse].append([pulse_flag[1],self.Start_Results[0],pulse_flag[3],self.Start_Results[1]]) #[ [channel,[pulse,[type,start,[iter],results_widt],[type,start,[iter],results] ] ]]
+                    self.ui.Iteration_list.addItem(pulse_flag_str)
+                    self.Iteration_All[index_channel_iter][current_pulse].append([pulse_flag[1],self.Start_Results[0],pulse_flag[3],self.Start_Results[1]]) #[ [channel,[pulse,[type,start,[iter],results],[type,start,[iter],results] ] ]]
                     self.Iteration_All_PB[index_channel_iter][current_pulse].append([pulse_flag[1],self.Start_Results_PB[0],pulse_flag[3],self.Start_Results_PB[1]])
                     #print(f"Iteration_All:{ self.Iteration_All}")
                     #print(f"Iteration_All_PB:{ self.Iteration_All_PB}")
                     #now we need to save this on self.iteration_list_saving
                     if self.iteration_list_saving!=[]:
                         for i in range(len(self.iteration_list_saving)):
-                            if self.iteration_list_saving[i][0]==channel_index_box:#self.ui.Channel_Pulse.currentIndex()
+                            if self.iteration_list_saving[i][0]==self.ui.Channel_Pulse.currentIndex():
                                 self.iteration_list_saving[i].append([pulse_flag_str])             
             #print(f"iteration_list_saving:{self.iteration_list_saving}")
             #print(f"Channel_Pulse_iter: {self.Channel_Pulse_iter}")
             pass
                     
+    
+            
+
+
     def create_function_from_string(self, func_str):
         # A multi-line string that dynamically creates the code for a new function generated_function. #change: used to be for i in i_values
         code = f""" 
@@ -706,6 +751,7 @@ def generated_function(i_values, W):
         exec(code, {}, local_dict)  # Execute the code string in a controlled environment
         #This means the code inside the exec statement will not have access to or interfere with the global environment or any existing variables outside this isolated space.
         return local_dict['generated_function'] # Retrieves the generated_function from local_dict.
+    
 
     def Overlapping_iterations(self,index_channel_iter,pulse_flag,current_pulse):
         overlap=False
@@ -724,15 +770,15 @@ def generated_function(i_values, W):
                     range_overlap=self.Channel_Pulse_iter[index_channel_iter][current_pulse][j]
         return [overlap,range_overlap] #it returns True i it overlaps and on which iteration range it does
     
-    def Overlapping_Pulses(self,index_channel,pulse_flag,current_pulse,channel_index_box):#here we calculate if the pulses overlap,and with which pulse it overlaps
+
+    def Overlapping_Pulses(self,index_channel,pulse_flag,current_pulse):#here we calculate if the pulses overlap,and with which pulse it overlaps
         result=[False,None]
 
         #we create a list with the amount of time the function is applied [1,2....N]
         #print(f"start_iter:{self.ui.Iterations_start.value()}")
         #print(f"end_iter:{self.ui.Iterations_end.value()}")
         #print((self.ui.Iterations_end.value() - self.ui.Iterations_start.value()) +1)
-        #i_values_for_calculation = list(range(1,(self.ui.Iterations_end.value() - self.ui.Iterations_start.value()) +2)) #+2 is crucial
-        i_values_for_calculation = list(range(1,(pulse_flag[3][1] - pulse_flag[3][0]) +2)) #+2 is crucial
+        i_values_for_calculation = list(range(1,(self.ui.Iterations_end.value() - self.ui.Iterations_start.value()) +2)) #+2 is crucial
         #print(f"i_values: {i_values_for_calculation}")
         # we calculate the original pulse width of the intended and pb pulses by using both indexes
         Sequence_ordered=self.order_specific_Channels_Pulses(self.Sequence_Pulses[index_channel])#####
@@ -750,7 +796,7 @@ def generated_function(i_values, W):
         # the delays wont affect overlapping since they are constant for any pulse
         #this works before we add the delays after the calculation of the results.
         new_width_pb_list =[]
-        index_delays=self.find_indices_first_terms(self.Delays_channel,channel_index_box)
+        index_delays=self.find_indices_first_terms(self.Delays_channel,self.ui.Channel_Pulse.currentIndex())
         delay_off=self.Delays_channel[index_delays][1][1]
         delay_on=self.Delays_channel[index_delays][1][0]
         #print(f"Delays:{self.Delays_channel[index_delays]}")
@@ -778,7 +824,7 @@ def generated_function(i_values, W):
             #print(f"end_time_list_intended:{end_time_list_intended}")
             #print(f"end_time_list_pb:{end_time_list_pb}")
             if pulse_flag[1]==0: #this will mean its the type: Only Pulses Moves, which is index cero from the combobox
-                result= self.Only_Pulse_Moves(end_time_list_pb,index_channel,current_pulse,i_values_for_calculation,pulse_flag,channel_index_box) #we see if there is any overlappping using pb_values
+                result= self.Only_Pulse_Moves(end_time_list_pb,index_channel,current_pulse,i_values_for_calculation,pulse_flag) #we see if there is any overlappping using pb_values
                 #below i had it with self.sequence_pulses  beofre
                 if result[0]==False:
                     self.Start_Results=[self.All_List[index_channel][current_pulse][0],new_width_intended_list] #just to then update Iteration_all
@@ -798,7 +844,7 @@ def generated_function(i_values, W):
                     iteration=i+pulse_flag[3][0]
                     width=new_width_intended_list[i]
                     check=True
-            dlg = QMessageBox(self.parent)
+            dlg = QMessageBox(self)
             dlg.setWindowTitle("Error!")
             dlg.setText(f"cannot adjust for the delay because width={width}<= {delay_off}=delay_off, in iteration {iteration}")
             dlg.setStandardButtons(QMessageBox.Ok)
@@ -813,7 +859,7 @@ def generated_function(i_values, W):
 
         return result
 
-    def Only_Pulse_Moves(self, end_time_list_pb,index_channel,current_pulse,i_values_for_calculation,pulse_flag,channel_index_box):
+    def Only_Pulse_Moves(self, end_time_list_pb,index_channel,current_pulse,i_values_for_calculation,pulse_flag):
                 #check for overlapping:
                 # find the pulse coming after this pulse, for this we use the function order_pb_pulses
                         # compar
@@ -824,7 +870,7 @@ def generated_function(i_values, W):
         reference_pb=self.order_pb_pulses() #just for reference and to avoid list out of range
         #print(f"reference:{reference_pb}")
         #  we must filter for the current channel [ [2,[]],[1,[]],[0,[]],[2,[]]] to [ [2,[]], [2,[]]]
-        channel=channel_index_box
+        channel=self.ui.Channel_Pulse.currentIndex()
         #print(f"channel: {channel}")
         #print(f"index_channel: {index_channel}")
         #here we filter the order_pb_pulses to only have the values of the current channel, it gets complicated when we have tuple[ (channel 1,channel 2), [start, end] ]
@@ -872,7 +918,6 @@ def generated_function(i_values, W):
     def Pulse_to_right(self): # Whatever comes afer the pulse moves to the right
 
         pass
-    
     def Sequence_to_right(self): # The whole sequence after the pulse moves to the right
         pass
 
@@ -880,22 +925,22 @@ def generated_function(i_values, W):
         self.simulation()
         self.iteration=0
 
-    #it updates every 
-    def simulation(self,value_loop,ms_value): #[[channel, [pulse,[type,[iter],start,[results]]]]] in the simulatio we use intended values
+
+
+
+
+    def simulation(self): #[[channel, [pulse,[type,[iter],start,[results]]]]] in the simulatio we use intended values
         # Initialize iteration counter
         self.iteration = 0 #current iteration
-        self.max_iterations = value_loop # Set the maximum number of iterations
+        self.max_iterations = self.ui.Loop_Sequence.value() # Set the maximum number of iterations
         # Set up a timer to update the plot
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_simulation) #the QTimer will call the update_simulation method at regular intervals specified by the user through the QSpinBox.
-        self.timer.start(ms_value)  # Update every 100 milliseconds
-    
+        self.timer.start(self.ui.ms.value())  # Update every 100 milliseconds
+
     def update_simulation(self):#[[channel, [pulse,[type,start,[iter],[results]]]]]
-        print(f"sequence_pulses: {self.Sequence_Pulses}")
-        print(f"self.iteration_all: {self.Iteration_All}")
         #print(f"self.Iteration_All: {self.Iteration_All}")
-        #self.ui.Simulation.clear()
-        self.clear_simulation_graph.emit()
+        self.ui.Simulation.clear()
         # Initialize data
         All_labels=[]
         self.green_list=[] #the pulse intervals of the green laser
@@ -910,8 +955,7 @@ def generated_function(i_values, W):
         #print(f"current:{self.iteration}")
         #print(f"iteration_all:{self.Iteration_All}")
         if self.iteration < self.max_iterations:
-            #self.ui.current_iteration.setText(f"current iteration: ({self.iteration})")
-            self.add_iteration_txt.emit(f"current iteration: ({self.iteration})")
+            self.ui.current_iteration.setText(f"current iteration: ({self.iteration})")
             for i in range(len(self.Iteration_All)): #we iterate for all the channels
                 Index=self.find_indices_first_terms(self.channel_labels,self.Iteration_All[i][0]) #we find the index of the channel on Iteration_ALl on the channel_labels list
                 #now we can addres the label
@@ -1029,8 +1073,7 @@ def generated_function(i_values, W):
                     y_green=np.array([ 10 if any(start <= x < end for start, end in green_ordered_int) else 5 for x in np.arange(0, max_end_time, 1)]) 
                     x_green=np.linspace(0, max_end_time, len(y_green) + 1)# when using stepMode='center' in pyqtgraph, the length of the x array must be equal to the length of the y array plus one. This requirement ensures that each step has a starting and ending x-coordinate.
                     self.green_sequence = pg.PlotDataItem(x_green, y_green, stepMode='center',pen={'color': (44, 160, 44), 'width': 1.5}) # stepmpde allows us to graph with vertical lines
-                    #self.ui.Simulation.addItem(self.green_sequence)
-                    self.add_simulation_graph.emit(self.green_sequence)
+                    self.ui.Simulation.addItem(self.green_sequence)
                     #print(f"y_green:{}")
                     #print(f"ygreen={y_green}")
                     #print(f"ygreen={y_green}")
@@ -1038,8 +1081,7 @@ def generated_function(i_values, W):
                     y_yellow=np.array([ 20 if any(start <= x < end for start, end in yellow_ordered_int) else 15 for x in np.arange(0, max_end_time, 1)])
                     x_yellow=np.linspace(0, max_end_time, len(y_yellow) + 1)
                     self.yellow_sequence = pg.PlotDataItem(x_yellow, y_yellow, stepMode='center',pen={'color': (254, 198, 21), 'width': 1.5})
-                    #self.ui.Simulation.addItem(self.yellow_sequence)
-                    self.add_simulation_graph.emit(self.yellow_sequence)
+                    self.ui.Simulation.addItem(self.yellow_sequence)
                     #print("yellow ordered int 2")
                     #print(f"y_yellow: {y_yellow}")
                     #print(f"x_yellow {x_yellow}")
@@ -1048,38 +1090,37 @@ def generated_function(i_values, W):
                     y_red=np.array([ 30 if any(start <= x < end for start, end in red_ordered_int) else 25 for x in np.arange(0, max_end_time, 1)])
                     x_red=np.linspace(0, max_end_time, len(y_red) + 1)
                     self.red_sequence = pg.PlotDataItem(x_red, y_red,stepMode='center', pen={'color': (214, 39, 40), 'width': 1.5})
-                    #self.ui.Simulation.addItem(self.red_sequence)
-                    self.add_simulation_graph.emit(self.red_sequence)
+                    self.ui.Simulation.addItem(self.red_sequence)
 
                 elif "apd"== item.lower():
                     y_apd=np.array([ 40 if any(start <= x < end for start, end in apd_ordered_int) else 35 for x in np.arange(0, max_end_time, 1)])
                     x_apd=np.linspace(0, max_end_time, len(y_apd) + 1)
                     self.apd_sequence = pg.PlotDataItem(x_apd, y_apd, stepMode='center', pen={'color': (250, 250, 250), 'width': 1.5})
-                    #self.ui.Simulation.addItem(self.apd_sequence)
-                    self.add_simulation_graph.emit(self.apd_sequence)
+                    self.ui.Simulation.addItem(self.apd_sequence)
 
                 elif "microwave" ==item.lower():
                     y_micro=np.array([ 50 if any(start <= x < end for start, end in micro_ordered_int)else 45 for x in np.arange(0, max_end_time, 1)])
                     x_micro=np.linspace(0, max_end_time, len(y_micro) + 1)
                     self.micro_sequence = pg.PlotDataItem(x_micro, y_micro,stepMode='center', pen={'color': (128, 0, 128), 'width': 1.5})
-                    #self.ui.Simulation.addItem(self.micro_sequence)
-                    self.add_simulation_graph.emit(self.micro_sequence)
+                    self.ui.Simulation.addItem(self.micro_sequence)
         #print(f"iteration:{self.iteration}")
         if self.iteration<self.max_iterations:
             self.iteration= self.iteration +1  #we add one to the the iteration of the dinamic graph
         else: 
             self.timer.stop()
             self.iteration = 0
-            #self.ui.Simulation.clear()
-            self.clear_simulation_graph.emit()
-            self.add_iteration_txt.emit(f"current iteration: ({self.iteration})")
-            #self.ui.current_iteration.setText(f"current iteration: ({self.iteration})")
+            self.ui.Simulation.clear()
+            self.ui.current_iteration.setText(f"current iteration: ({self.iteration})")
       
-    def calculate_Loop_Duration(self,max_counter): #duration fo the pulse= sum of all the durations of each iteration
+
+
+
+
+
+    def calculate_Loop_Duration(self): #duration fo the pulse= sum of all the durations of each iteration
         # Initialize data
         counter=0
-        max_counter=max_counter
-        #max_counter=self.ui.Loop_Sequence.value()
+        max_counter=self.ui.Loop_Sequence.value()
         All_labels=[]
         self.green_list=[] #the pulse intervals of the green laser
         self.yellow_list=[]
@@ -1156,22 +1197,28 @@ def generated_function(i_values, W):
                                                 pass
             self.duration=self.duration+max_end_time
         #print(f"Duration: ({self.duration})")
-        duration_str=f"Duration:{self.duration}"
-        self.duration_signal.emit(duration_str)
-        #self.ui.Duration_Loop.setText(f"Duration:{self.duration}")
+        self.ui.Duration_Loop.setText(f"Duration:{self.duration}")
         pass
+
+
+
 
     def stop_simulation(self):
         if self.iteration>0:
             self.timer.stop()
             self.iteration = 0
-            #self.ui.Simulation.clear()
-            self.clear_simulation_graph.emit()
+            self.ui.Simulation.clear()
         pass
+
+
+
+
+
+
 
     def order_intended_pulses(self): #order pulse blaster sequence in time 
         if all(len(self.Sequence_Pulses[i])==1 for i in range(len(self.Sequence_Pulses))):
-            dlg = QMessageBox(self.parent)
+            dlg = QMessageBox(self)
             dlg.setWindowTitle("Error!")
             dlg.setText("No pulses added")
             dlg.setStandardButtons(QMessageBox.Ok)
@@ -1246,7 +1293,7 @@ def generated_function(i_values, W):
     
     def order_pb_pulses(self): #order pulse blaster sequence in time 
         if all(len(self.pb_pulses[i])==1 for i in range(len(self.pb_pulses))):
-            dlg = QMessageBox(self.parent)
+            dlg = QMessageBox(self)
             dlg.setWindowTitle("Error!")
             dlg.setText("No pulses added")
             dlg.setStandardButtons(QMessageBox.Ok)
@@ -1321,7 +1368,7 @@ def generated_function(i_values, W):
     
     def order_general_pulses(self,LIST): #order pulse blaster sequence in time 
         if all(len(LIST[i])==1 for i in range(len(LIST))):
-            dlg = QMessageBox(self.parent)
+            dlg = QMessageBox(self)
             dlg.setWindowTitle("Error!")
             dlg.setText("No pulses added")
             dlg.setStandardButtons(QMessageBox.Ok)
@@ -1394,6 +1441,12 @@ def generated_function(i_values, W):
         #print(self.final_result)
         return self.final_result
     
+
+
+
+
+
+    
     def order_specific_Channels_Pulses(self,List): #List must be like [channel,[start,end],[start,end]]
         unordered=[]
         for i in range(len(List)):
@@ -1425,7 +1478,6 @@ def generated_function(i_values, W):
         #print("after calling the function")
         #print(f"All_list_pb_inside: {self.All_List_PB}")
         return self.All_List_PB
-    
     def pulses_ordered_by_time_channels(self): #here we prepare the variable self.All_Lists=[[channel, ordered pulses], ]
         channels_with_pulses=[]
         self.All_List=[]
@@ -1450,12 +1502,15 @@ def generated_function(i_values, W):
 
         return self.All_List
     
+
     def clear_list(self): #should basically restart everyhting
         self.channel_labels=[] #[[channel, label],[channel, label]]
+        self.ui.Channel_List.clear()
         self.added_channels = []
         self.added_flags=[]
         self.pb_pulses=[] # here we keep all the pulses added from all the channels,adjusted for the delays, this is for the pulse blaster
         self.Sequence_Pulses=[]
+        self.ui.Sequence_Diagram.clear()
         self.green_list=[]
         self.yellow_list=[]
         self.red_list=[]
@@ -1467,10 +1522,15 @@ def generated_function(i_values, W):
         self.All_List_PB=[]
         self.Max_end_type=[] #[ [channel,[pulse,[type],[max_end]]], [channel,.....]]
         self.iteration_list_saving=[]
+        self.ui.Iteration_list.clear()
+        self.ui.Pulses_box.clear()
         self.Iteration_All=[] 
         self.Start_Results=[]
         self.Global_end_time=0
+        self.ui.Simulation.clear()
+        self.ui.Duration_Loop.setText("Duration: ( )")
         self.duration=0
+        self.ui.current_iteration.setText("current iteration: ( )")
         self.Delays_channel=[]
         self.green_list_pb=[]
         self.yellow_list_pb=[]
@@ -1479,6 +1539,55 @@ def generated_function(i_values, W):
         self.micro_list_pb=[]
         self.Iteration_All_PB=[]
         # here we start with a basic plot, which gets updated, if we either add channels, or we add pulses in thoses channels
+    def remove_channel(self,item): #removes a single channel by clicking one item from the list and then pressing remove #item is the event handler
+        item = self.ui.Channel_List.currentItem()
+        item_text = item.text()
+        #print(item_text)
+        # Get the row of the clicked item
+        row = self.ui.Channel_List.row(item)
+        # Remove the item from the list widget
+        self.ui.Channel_List.takeItem(row)
+        if "green" in item_text.lower(): 
+            self.green_list=[] #remove all the list intervals
+            removal="green"
+            self.ui.Sequence_Diagram.removeItem(self.green_sequence)
+        elif "yellow" in item_text.lower():
+            self.yellow_list=[]
+            removal="yellow"
+            self.ui.Sequence_Diagram.removeItem(self.yellow_sequence)
+        elif "red" in item_text.lower():
+            self.red_list=[]
+            removal="red"
+            self.ui.Sequence_Diagram.removeItem(self.red_sequence)
+        elif "apd" in item_text.lower():
+            self.apd_list=[]
+            removal="apd"
+            self.ui.Sequence_Diagram.removeItem(self.apd_sequence)
+        elif "microwave" in item_text.lower(): 
+            self.micro_list=[]
+            removal="microwave"
+            self.ui.Sequence_Diagram.removeItem(self.micro_sequence)
+    
+        #here we get the index of the sublist [channel,label] by knowing the la
+        for i, inner_list in enumerate(self.channel_labels): #The enumerate function in Python adds a counter to an iterable (like a list) and returns it as an enumerate object. This allows you to loop over the iterable and have access to both the index and the value of each element.
+            if removal in inner_list: # Check if the sublist has the label
+                channel_index = i
+
+       #channel_index= self.find_indices_first_terms(self.channel_labels,removal) # here we get the index of the channel in the list
+        channel_value=self.channel_labels[channel_index][0] # we save the value of the channel 
+        del self.channel_labels[channel_index] #delete the corrsponding[channel,label]
+        index_pulses= self.find_indices_first_terms(self.Sequence_Pulses,channel_value)  #
+        del self.Sequence_Pulses[index_pulses] #remove the specific color or channel pulses from the list 
+        del self.pb_pulses[index_pulses]
+        added_index=self.added_channels.index(channel_value) #remove it from added_channels 
+        del self.added_channels[added_index]
+        flags_index=self.find_indices_first_terms(self.added_flags,channel_value)# remove from added_flags
+        del self.added_flags[flags_index]
+        #we need to remove teh rest of the variables
+        #print(f"channel_value:{channel_value}")
+        #print(f"Sequence_Pulses: {self.Sequence_Pulses}")
+        #print(f"added_channels: {self.added_channels} ")
+        #print(f"added_flags: {self.added_flags}")
 
     def contains_sublists(self,lst):
         for item in lst:
@@ -1489,6 +1598,9 @@ def generated_function(i_values, W):
                     return True
         return False
             
+    
+
+
 #Now we proceed to added the pulses groupbox fromt the gui
 #but first we create a fucntion that allows us to find indexes of a list of lists, this will help us later
     def find_indices_first_terms(self,nested_list, target): # i: A variable that will hold the index of the current sublist.enumerate(nested_list): A built-in function that allows you to iterate over nested_list while keeping track of both the index (i) and the element (sublist). sublist: A variable that will hold the current sublist from nested_list. for: Starts a loop to iterate over nested_list.
@@ -1506,23 +1618,20 @@ def generated_function(i_values, W):
                 return (i, sublist.index(target))
         return None
 
-    def Run_experiment(self,value_loop,channel_count): 
+    def Run_experiment(self): 
 
         # Create the sequence
         #counter=0
-        max_iterations=value_loop
+        max_iterations=self.ui.Loop_Sequence.value()
         #first we need to add the pulses to of the current iteration to a list
-        self.channels_conversion(channel_count) #here we get the values in decimal form of the repective channels
-        # we can acces them in the list self.decimal_channel
+        self.channels_conversion() #here we get the values in decimal form of the repective channels
         #instead of adding the tao time, we simply get the previous pulseen end time and the next pulse start time and we substract them
         #print("Experiment runned")
         #print(f"max_iter:{max_iterations}")
-        #HALF THE PART OF THIS FUNCITON IS TO CREATE A LIST CALLED:
         self.PULSE_BLASTER=[]
-        #BUT FIRST WE NEED TO START BY CREATING ANOTHER LIST: All_pulses which is[ [channel,[start,end],[start,end]], [channel,[start,end]] were per each channel the pulse sequence is ordered
         for x in range(1,max_iterations+2): 
             #print(f"x:{x}")
-            #All_channels=[]
+            All_channels=[]
             sequence_per_iter=[]   
             #print(f"iteration_all_pb: {self.Iteration_All_PB}")         
             for i in range(len(self.Iteration_All_PB)): #we iterate for all the channels
@@ -1530,17 +1639,17 @@ def generated_function(i_values, W):
                 #now we can addres the label
                 channel=self.channel_labels[Index][0] #here we save the label 
                 All_pulses=[]
-                if len(self.Iteration_All_PB[i])>1:#here we filter the channels that only have pulses on Iteration_All, must be bigger than 1 because 1 is the channel 
-                    #All_channels.append([channel])
+                if len(self.Iteration_All_PB[i])>1:#here we filter the channels that only have pulses on Iteration_All,
+                    All_channels.append([channel])
                     #print(f"AllLabels:{All_labels}")
-                    for j in range(len(self.Iteration_All_PB[i])): #iterate through the amount of pulses per this channel
+                    for j in range(len(self.Iteration_All_PB[i])): #iterate through the amount of pulses per channel
                         if j>0:#after the channel index
                             #print(f"j:{j}")
                             if len(self.Iteration_All_PB[i][j])==1: #in case there are no variatons to the pulse
                                 # to grab the pulses that have no iter variations in the current iteration of the dinamic graph
                                 #print(f"a pulse with NO variations{self.Iteration_All_PB[i][j]}")
                                 unordered=[]
-                                for z in range(len(self.pb_pulses[i])): #we just do this to order the sequeunce pulses on this particular channel, pb_pulses should be sinchronized with Iteration_All
+                                for z in range(len(self.pb_pulses[i])): #we just do this to order the sequeunce pulses on this particular channel
                                     if z>0:
                                         unordered.append(self.pb_pulses[i][z])   
                                 ordered_sequence=sorted(unordered, key=lambda x: x[0])
@@ -1548,15 +1657,15 @@ def generated_function(i_values, W):
                                 start_per_iter=ordered_sequence[j-1][0]
                                 end_per_iter=ordered_sequence[j-1][1]
                                 All_pulses.append([start_per_iter,end_per_iter])
-                            else: # we enter a pulse which has  variations
+                            else: # we enter a pulse which has a number of variations
                                 #print("a pulse WITH variations")
                                 for k in range(len(self.Iteration_All_PB[i][j])): #we iterate through the variations
                                     if k>0: #because the k=0 is the pulse
                                         #print(f"k:{k}")
-                                        i_values=list(range(1, self.Iteration_All_PB[i][j][k][2][1]-self.Iteration_All_PB[i][j][k][2][0]+2)) # we create a list with all the iterations per iteration range in the current k index, example [56,57,58,59,60] if the range is [56,60]
+                                        i_values=list(range(1, self.Iteration_All_PB[i][j][k][2][1]-self.Iteration_All_PB[i][j][k][2][0]+2)) # we create a list with all the iterations per iteration range in the current k index, example [56,57,58,59,60]
                                         #print(f"ivalues: {i_values}")
                                         if x in i_values :#we only do this operation if the iteration is inside the varying iteration values of the varying pulse and if the iteration is equal or bigger than the amount of interations there are, maybe its redundant idk
-                                            index_of_iteration= i_values.index(x) #+1 here we find the index of the iteration on the list i_values
+                                            index_of_iteration= i_values.index(x) #+1 here we find the index of the iteration on the list i_values, ValueError: 0 is not in list
                                             #print(f"j:{j}")
                                             #print(f"k: {k}")
                                             #print(f"ivalues: {i_values}")
@@ -1564,8 +1673,8 @@ def generated_function(i_values, W):
                                             #print(f"Iteration_All:{self.Iteration_All}")
                                             #i_values_for_calculation = list(range(1,self.Iteration_All[i][j][k][1][1] - self.Iteration_All[i][j][k][1][0] +1)) #[1,2,3,4,5,6,7,8,9]
                                             #  add the new pulses to each corresponding list (channel_list)
-                                            start_per_iter=self.Iteration_All_PB[i][j][k][1] 
-                                            end_per_iter=self.Iteration_All_PB[i][j][k][3][index_of_iteration]+start_per_iter 
+                                            start_per_iter=self.Iteration_All_PB[i][j][k][1] # this is giving me a diferent pulse start time
+                                            end_per_iter=self.Iteration_All_PB[i][j][k][3][index_of_iteration]+start_per_iter #index out of range!!!
                                             All_pulses.append([start_per_iter,end_per_iter])
                                         else:# the pulse with varying iter, now returns to its previous value
                                             unordered=[]
@@ -1579,14 +1688,14 @@ def generated_function(i_values, W):
                                             end_per_iter=ordered_sequence[j-1][1]
                                             All_pulses.append([start_per_iter,end_per_iter])
                                             pass
-                All_pulses=sorted(All_pulses, key=lambda x: x[0]) # by now we have Allpulses= [ [start,end],[],[]..] we must order it
+                All_pulses=sorted(All_pulses, key=lambda x: x[0])
                 #print(f"All_pulses:{All_pulses}")
-                All_pulses.insert(0,channel)# we put a channel infron of the ordered pulse sequence in this list
+                All_pulses.insert(0,channel)
                 #print(f"All_pulses:{All_pulses}")
-                sequence_per_iter.append(All_pulses) # sequence_per_iter gets this shape [ [channel,[start,end],[start,end]] , [channe...]]] the pulses are ordered inside each channel however the channels between themselves are not ordered
-                sequence_per_iter= self.order_general_pulses(sequence_per_iter) #this functions orders the list, leaving it as [ [channel/s,[start,end]], [chann...]...]
-                #print(f"sequence per iter:{sequence_per_iter}") 
-            self.PULSE_BLASTER.append([x-1 ,sequence_per_iter]) # this list gets this shape[ [iteration,[ [channel/s,[start,end]], [chann...]...]], [iteration,.......] ]
+                sequence_per_iter.append(All_pulses)
+                sequence_per_iter= self.order_general_pulses(sequence_per_iter)
+                #print(f"sequence per iter:{sequence_per_iter}")  
+            self.PULSE_BLASTER.append([x-1 ,sequence_per_iter])
             print(f"Pulse_Blaster:{self.PULSE_BLASTER}")
         ######we could make this another function
         dt=0 # dark time, no pulses ON, its decimal value must be cero
@@ -1608,11 +1717,11 @@ def generated_function(i_values, W):
             #start=spinapi.pb_inst_pbonly(decimal_value,Inst.LOOP,int(self.ui.Loop_Sequence.value()),(self.PULSE_BLASTER[1][0][1][1]-self.PULSE_BLASTER[counter][1][0][1][0])*spinapi.us)
             #print(f"spinapi.pb_inst_pbonly({decimal_value},Inst.CONTINUE,0,({end_time-start_time})*spinapi.us)")
         #if len(self.PULSE_BLASTER[counter][1])>1: # to see if there are more pulses (not including the first one) on this iteration
-        print(f"len(PULSE_BLASTER:{len(self.PULSE_BLASTER)})") #should be one less
+        print(f"len(PULSE_BLASTER:{len(self.PULSE_BLASTER)})")
         for counter in range(len(self.PULSE_BLASTER)):
-            print(f"counter:{counter}")
-            print(f"self.PULSE_BLASTER[{counter}][1]--> pulses per iteration:{self.PULSE_BLASTER[counter][1]}")
-            for i in range(len(self.PULSE_BLASTER[counter][1])): # we iterate for the amount of pulses per iteration (counter)
+            print(f"counter")
+            print(f"self.PULSE_BLASTER[counter][1].{self.PULSE_BLASTER[counter][1]}")
+            for i in range(len(self.PULSE_BLASTER[counter][1])): # we iterate for the amount of pulses per channel,
                 start_time=self.PULSE_BLASTER[counter][1][i][1][0]
                 print(f"start_time:{start_time}")
                 end_time=self.PULSE_BLASTER[counter][1][i][1][1]
@@ -1622,9 +1731,9 @@ def generated_function(i_values, W):
                 if i==0:
                     if start_time>0: #if the first pulse starts after time cero, the first instruction must be a delay
                         print(f"there is a delay at the start of {start_time}")
-                        self.PB_WIDTH.append([dt,start_time]) # here we add the dark time to the isntruction list
-                        decimal_value=self.finding_decimal_channel(channel) # we must transform the channel value to decimal form
-                        self.PB_WIDTH.append([decimal_value,end_time-start_time]) # here we add the next instruction to the list
+                        self.PB_WIDTH.append([dt,start_time]) # here we add the dark time
+                        decimal_value=self.finding_decimal_channel(channel)
+                        self.PB_WIDTH.append([decimal_value,end_time-start_time])
                         #print(f"PB_WIDTH:{self.PB_WIDTH}")
                     else:
                         decimal_value=self.finding_decimal_channel(channel)
@@ -1641,7 +1750,7 @@ def generated_function(i_values, W):
                     print(f"decimal_value:{decimal_value}")
                     self.PB_WIDTH.append([decimal_value,end_time-start_time])
         print(f"PB_WIDTH:{self.PB_WIDTH}")
-        self.Send_Pulse_Blaster() #now we continue printing zending the instrucitons to the pulse blaster
+        self.Send_Pulse_Blaster()
 
     def Send_Pulse_Blaster(self):
         #spinapi.pb_init()
@@ -1680,11 +1789,11 @@ def generated_function(i_values, W):
             decimal_value=decimal+decimal_value
         return decimal_value        
 
-    def channels_conversion(self,channel_count):
+    def channels_conversion(self):
         #we must first create a binary chain with as many ceros as there are channels
         binary=[]
         self.decimal_channel=[]
-        for i in range(channel_count):
+        for i in range(self.ui.Channel_Identifier.count()):
             binary.append(0)
         #print(f"binary:{binary}")
         #create the binary number as a string per each channel which is in self.added_channels
@@ -1718,3 +1827,11 @@ def generated_function(i_values, W):
             # Handle the case where the input is not a valid binary string
             print(f"Error: '{binary_str}' is not a valid binary string.")
             return None
+
+app = QApplication(sys.argv)
+window = Window()
+window.show()
+
+
+sys.exit(app.exec_())
+

@@ -70,7 +70,10 @@ class Sequence(QObject): #A sequence per iteration ( 1 frame), QObject allows si
             
             indexes_delete=[] #indexes we will delete later
             for j in range(len(self.pb_pulses)): #we iterate over the pb_pulses in the respective channel, to check for overlapping
-                
+                Partially_Left=False
+                Partially_Rigth=False
+                Completely_Inside=False
+                Completely_Ontop=False
                 #print(f"pb_pulses per iteration{j}: {self.pb_pulses[j].start_tail}, {self.pb_pulses[j].end_tail}")
                 Partially_Left=(self.pb_pulses[j].start_tail<=end_tail_pb and self.pb_pulses[j].start_tail>start_tail_pb and self.pb_pulses[j].end_tail>=end_tail_pb) # if the the new pulse finishes after the start of the previous pulse and starts before the start of the previous pulse
                 Partially_Right=(self.pb_pulses[j].end_tail>=start_tail_pb and self.pb_pulses[j].start_tail<start_tail_pb and self.pb_pulses[j].end_tail<=end_tail_pb) # if the new pulse finishes after the end of the previous pulse and starts before the end of the previous pulse

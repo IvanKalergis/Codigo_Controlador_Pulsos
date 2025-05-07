@@ -10,15 +10,16 @@ class Experiment(QObject):
         self.pb_sequence=[]
         self.iteration=iteration
     
-    def Run_Exp(self):
+    def Prepare_Exp(self):
         if len(self.Exp_i_pb)!=0: 
             self.Order_Exp_i_pb()
-            self.Send_Spinapi()
         else: #send error message   
             pass
+        
         print(f"len(self.pb_sequence):{len(self.pb_sequence)}")
-        for pulse in self.pb_sequence:
+        for pulse in self.pb_sequence: #this is just to show that it0s working it should be taken away later
             print(f"Pulse start:{pulse.start_tail}, end:{pulse.end_tail}, channel:{pulse.channel_binary}")
+        
 
     def Order_Exp_i_pb(self): 
         """ To order the list Exp_pb.  
@@ -30,7 +31,6 @@ class Experiment(QObject):
         
         # Step 1: Flatten all the pulse sequences into one list
         all_pulses = [pulse for pb_pulse_list in self.Exp_i_pb for pulse in pb_pulse_list]
-        print(all_pulses)
         events = []
         # Step 2: Create events from every pulse's start and end times, per channel
         for pulse in all_pulses:
@@ -49,7 +49,8 @@ class Experiment(QObject):
         for time, event_type, channel in events:
             # If the time has moved forward and some channels are active, record a Pulse
             if last_time is not None and time != last_time and active_channels:
-                self.pb_sequence.append(Pulse(last_time, time, active_channels.copy()))
+                sorted_channels = sorted(active_channels.copy())######### to transform them form a set to a list
+                self.pb_sequence.append(Pulse(last_time, time, sorted_channels))
 
             # Update active channel set
             if event_type == 0:
@@ -63,7 +64,4 @@ class Experiment(QObject):
         return 
     
 
-    def Send_Spinapi(self):
-        """ We send the pulses to spinapi in the correct order
-        """
-        pass
+  
