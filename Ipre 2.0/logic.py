@@ -10,8 +10,8 @@ from PySide2.QtWidgets import (
     QWidget,
     QMessageBox
 )
-#import spinapi
-#from spinapi import Inst, ON
+import spinapi
+from spinapi import Inst, ON
 from PySide2.QtGui import QPen,QColor
 import pyqtgraph as pg #para los gráficos de las secuencias
 import numpy as np
@@ -141,32 +141,32 @@ class PulseManagerLogic(QObject):
         """
         Here we recieve the flat list with all the pulses, which we then sen to the PB
         """
-        #spinapi.pb_select_board(0)
-        #if spinapi.pb_init() != 0:
+        spinapi.pb_select_board(0)
+        if spinapi.pb_init() != 0:
             #####print("Error initializing board: %s" %pb_get_error())
-            #input("Please press a key to continue.")
-            #exit(-1)
-        #spinapi.pb_reset() 
-        #spinapi.pb_core_clock(500)
-        #spinapi.pb_start_programming(spinapi.PULSE_PROGRAM)
-        #start=spinapi.pb_inst_pbonly(int(sum(Flat_exp[0].channel_binary)),Inst.LOOP,1,(Flat_exp[i].end_tail-Flat_exp[i].start_tail)*spinapi.us)
+            input("Please press a key to continue.")
+            exit(-1)
+        spinapi.pb_reset() 
+        spinapi.pb_core_clock(500)
+        spinapi.pb_start_programming(spinapi.PULSE_PROGRAM)
+        start=spinapi.pb_inst_pbonly(int(sum(Flat_exp[0].channel_binary[0])),Inst.LOOP,1,(Flat_exp[i].end_tail-Flat_exp[i].start_tail)*spinapi.us)
         print(f"Flat_exp[0].channel_binary:{Flat_exp[0].channel_binary[0]}")
         print(f"spinapi.pb_inst_pbonly({sum(Flat_exp[0].channel_binary[0])},Inst.LOOP,{1},({Flat_exp[0].end_tail-Flat_exp[0].start_tail})*spinapi.us)") 
         for i in range(1,len(Flat_exp)):# we start from one because we already did the 0 index
             if i!=len(Flat_exp) -1:
                 print(f"spinapi.pb_inst_pbonly({sum(list(Flat_exp[i].channel_binary[0]))},Inst.CONTINUE,0,({Flat_exp[i].end_tail-Flat_exp[i].start_tail})*spinapi.us)")
-                #spinapi.pb_inst_pbonly(int(sum(Flat_exp[i].channel_binary)),Inst.CONTINUE,0,(Flat_exp[i].end_tail-Flat_exp[i].start_tail)*spinapi.us)
+                spinapi.pb_inst_pbonly(int(sum(Flat_exp[i].channel_binary[0])),Inst.CONTINUE,0,(Flat_exp[i].end_tail-Flat_exp[i].start_tail)*spinapi.us)
             else:
                 print(f"spinapi.pb_inst_pbonly({sum(list(Flat_exp[i].channel_binary[0]))},Inst.CONTINUE,0,({Flat_exp[i].end_tail-Flat_exp[i].start_tail})*spinapi.us)")
-                #spinapi.pb_inst_pbonly(int(sum(Flat_exp[i].channel_binary)),Inst.CONTINUE,0,(Flat_exp[i].end_tail-Flat_exp[i].start_tail)*spinapi.us)
+                spinapi.pb_inst_pbonly(int(sum(Flat_exp[i].channel_binary[0])),Inst.CONTINUE,0,(Flat_exp[i].end_tail-Flat_exp[i].start_tail)*spinapi.us)
                 print(f"spinapi.pb_inst_pbonly({sum(list(Flat_exp[i].channel_binary[0]))},Inst.END_LOOP,start,{Flat_exp[i].end_tail-Flat_exp[i].start_tail}")
-                #spinapi.pb_inst_pbonly(int(sum(Flat_exp[i].channel_binary)),Inst.END_LOOP,start,Flat_exp[i].end_tail-Flat_exp[i].start_tail)
-        #spinapi.pb_inst_pbonly(int(0),Inst.STOP,0,1*spinapi.us) # This instruction stops the pulse sequence. The duration is set to a very small value to ensure the stop instruction is executed almost immediately.
+                spinapi.pb_inst_pbonly(int(sum(Flat_exp[i].channel_binary[0])),Inst.END_LOOP,start,Flat_exp[i].end_tail-Flat_exp[i].start_tail)
+        spinapi.pb_inst_pbonly(int(0),Inst.STOP,0,1*spinapi.us) # This instruction stops the pulse sequence. The duration is set to a very small value to ensure the stop instruction is executed almost immediately.
         print(f"spinapi.pb_inst_pbonly(int(0),Inst.STOP,0,0.01*spinapi.us)")
-        #spinapi.pb_stop_programming()  # This function call signals the end of programming the pulse sequence. It tells the SpinAPI library that the sequence definition is complete and the pulse program can be finalized
+        spinapi.pb_stop_programming()  # This function call signals the end of programming the pulse sequence. It tells the SpinAPI library that the sequence definition is complete and the pulse program can be finalized
         print(f"spinapi.pb_stop_programming()")
-        #spinapi.pb_reset() 
-        #spinapi.pb_start()
+        spinapi.pb_reset() 
+        spinapi.pb_start()
 
         
         pass
