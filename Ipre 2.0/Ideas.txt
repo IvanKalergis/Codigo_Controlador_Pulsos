@@ -23,3 +23,10 @@ Mayor change to the UI file:
 To convert ui to py:
     - cd /Users/ivankalergis/Documents/GitHub/Codig_Controlador_Pulsos/Nuevo_intento
     - /Users/ivankalergis/Library/Python/3.8/bin/pyside2-uic General_Pulses.ui -o Sequence_one.py
+
+Task: tipo de programmacion de entradas y salidas de la NIH
+    -defines un canal ie: read voltage
+Lo que queda: 
+    Poder eliminar un canal, osino eleminar todo 
+    Esbozar cada secuencia por iteracion seleccionada (no hay porque hacer una simulación)
+    Generar grafico intensidad por tiempo de las cuentas recibidas cuentas por segundo eje y tiempo eje x

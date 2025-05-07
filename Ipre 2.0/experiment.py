@@ -35,23 +35,25 @@ class Experiment(QObject):
         # Step 2: Create events from every pulse's start and end times, per channel
         for pulse in all_pulses:
             for ch in pulse.channel_binary:
-                events.append((pulse.start_tail, 0, ch))  # Start event
-                events.append((pulse.end_tail, 1, ch))    # End event
-
+                events.append((pulse.start_tail, 0, ch))  # 0 = Start event
+                events.append((pulse.end_tail, 1, ch))    # 1 = end event
         # Step 3: Sort events chronologically; starts before ends if times equal
         events.sort()
 
         self.pb_sequence = []
         active_channels = set()
-        last_time = None
+        last_time = 0  # Start from 0 even if first pulse starts later
 
         # Step 4: Sweep through time and build new Pulse objects for each interval
         for time, event_type, channel in events:
+            # Fill in idle gap if needed
+            sorted_channels = sorted(active_channels.copy())######### to transform them into a list
             # If the time has moved forward and some channels are active, record a Pulse
-            if last_time is not None and time != last_time and active_channels:
-                sorted_channels = sorted(active_channels.copy())######### to transform them form a set to a list
-                self.pb_sequence.append(Pulse(last_time, time, sorted_channels))
-
+            if last_time < time:# Fill in idle gap if needed with an empty pulse channel 0
+                if active_channels:
+                    self.pb_sequence.append(Pulse(last_time, time, sorted_channels))
+                else:
+                    self.pb_sequence.append(Pulse(last_time, time, [0]))  # idle pulse
             # Update active channel set
             if event_type == 0:
                 active_channels.add(channel)      # Pulse started
