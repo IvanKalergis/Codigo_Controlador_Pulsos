@@ -59,7 +59,7 @@ class Window(QWidget,Ui_Form):
         It checks if the channel is valid and adds it to the list.
         """
         channel_tag = self.ui.Channel_Identifier.currentIndex()
-        print(channel_tag)
+        print(f"channel added:{channel_tag}")
         delay= [self.ui.Delay_ON.value(),self.ui.Delay_OFF.value()]
         channel_label = self.ui.Type_Channel.text()#we get the label of the channel from the gui
         channel_label=channel_label.lower() #we leave it undercase
