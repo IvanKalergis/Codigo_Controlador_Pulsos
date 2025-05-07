@@ -130,17 +130,24 @@ class PulseManagerLogic(QObject):
         """ Con la lista Experiment_hub ya completa, flateamos la lista, y luego le enviamos los pulsos a la pulse Blaster """
         # Flatten all the pulses into one list
         Flat_exp= [pulse for exp in self.Experiment_Hub for pulse in exp.pb_sequence]
-        ##### Just to check if it's working #######
 
         self.Send_to_Pulse_Blaster(Flat_exp)
+        """"
+        Here we should add a fucntion to recieve the photon count
+        
+        """
+        spinapi.pb_start()
         
 
 
 
     def Send_to_Pulse_Blaster(self,Flat_exp):
         """
-        Here we recieve the flat list with all the pulses, which we then sen to the PB
+        Here we recieve the flat list with all the pulses, which we then sent to the PB
+        Even if there nos laser device for example apd, it will not through an error and,
+        just continue to the next instruction after the give time.
         """
+        spinapi.pb_close()
         spinapi.pb_select_board(0)
         if spinapi.pb_init() != 0:
             #####print("Error initializing board: %s" %pb_get_error())
@@ -149,7 +156,7 @@ class PulseManagerLogic(QObject):
         spinapi.pb_reset() 
         spinapi.pb_core_clock(500)
         spinapi.pb_start_programming(spinapi.PULSE_PROGRAM)
-        start=spinapi.pb_inst_pbonly(int(sum(Flat_exp[0].channel_binary[0])),Inst.LOOP,1,(Flat_exp[i].end_tail-Flat_exp[i].start_tail)*spinapi.us)
+        start=spinapi.pb_inst_pbonly(int(sum(Flat_exp[0].channel_binary[0])),Inst.LOOP,1,(Flat_exp[0].end_tail-Flat_exp[0].start_tail)*spinapi.us) # generates a loop of instruction here only one iteration
         print(f"Flat_exp[0].channel_binary:{Flat_exp[0].channel_binary[0]}")
         print(f"spinapi.pb_inst_pbonly({sum(Flat_exp[0].channel_binary[0])},Inst.LOOP,{1},({Flat_exp[0].end_tail-Flat_exp[0].start_tail})*spinapi.us)") 
         for i in range(1,len(Flat_exp)):# we start from one because we already did the 0 index
@@ -166,11 +173,11 @@ class PulseManagerLogic(QObject):
         spinapi.pb_stop_programming()  # This function call signals the end of programming the pulse sequence. It tells the SpinAPI library that the sequence definition is complete and the pulse program can be finalized
         print(f"spinapi.pb_stop_programming()")
         spinapi.pb_reset() 
-        spinapi.pb_start()
-
-        
         pass
 
+    def Stop_Experiment(self): 
+        spinapi.pb_stop() #stop de program
+        spinapi.pb_close() # close the pusle blaster, becasue when you want to open it again it must be close for this
         
 
             

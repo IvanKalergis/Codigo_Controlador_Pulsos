@@ -40,6 +40,7 @@ class Window(QWidget,Ui_Form):
         self.ui.Loop_Sequence.setValue(1)
         self.ui.ms.setValue(500) # a normal speed
         self.ui.Run_Sequence.clicked.connect(self.Run_Experiment_Gui)
+        self.ui.Stop_Sequence.clicked.connect(self.Stop_Experiment_Gui)
 
         ########## SIGNALS and connectios ##########
         
@@ -98,6 +99,8 @@ class Window(QWidget,Ui_Form):
     def Run_Experiment_Gui(self):
         value_loop=self.ui.Loop_Sequence.value()
         self.PML.Run_experiment(value_loop)
+    def Stop_Experiment_Gui(self):
+        self.PML.Stop_Experiment()
 
     @Slot(str)
     def show_error_message(self, error_str):
