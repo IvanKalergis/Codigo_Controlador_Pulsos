@@ -31,7 +31,7 @@ class Window(QWidget,Ui_Form):
         self.ui.Puls_Width.setMinimum(0)
         self.ui.Puls_Width.setMinimum(1)
         self.ui.Iterations_start.setMaximum(1000000)
-        self.ui.Iterations_start.setMinimum(0) 
+        self.ui.Iterations_start.setMinimum(1) 
         self.ui.Iterations_end.setMaximum(1000000)
         self.ui.Iterations_end.setValue(5)
         self.ui.Iterations_end.setMinimum(self.ui.Iterations_start.value()+1) 

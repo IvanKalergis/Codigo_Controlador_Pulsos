@@ -27,6 +27,9 @@ To convert ui to py:
 Task: tipo de programmacion de entradas y salidas de la NIH
     -defines un canal ie: read voltage
 Lo que queda: 
-    Poder eliminar un canal, osino eleminar todo 
+    HOY
+    Poder eliminar un canal, osino eliminar todo 
     Esbozar cada secuencia por iteracion seleccionada (no hay porque hacer una simulación)
     Generar grafico intensidad por tiempo de las cuentas recibidas cuentas por segundo eje y tiempo eje x
+    generar las iteraciones de los pulsos partiendo de 1 en vex de 0
+    Cuando apreto Stop_Experiment debo también parar la toma de cuentas del apd?

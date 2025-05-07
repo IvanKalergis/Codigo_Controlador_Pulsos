@@ -31,13 +31,13 @@ class Sequence(QObject): #A sequence per iteration ( 1 frame), QObject allows si
         pulse_pb = Pulse(start_tail,end_tail,self.binary) #with delays
         
         status = self.check_pulse_fusion(pulse_pb,pulse) #check if the pulse doensnt overlap
-        print(f"Fusion?: {status[2]}")
+        print(f"Fusion?: {status[2]}, new pulse:{status[0]}")
         if status[2]==True: #if there is no overlap with the fixed pulses
-            pulse_pb=Pulse(status[0][0],status[0][1],self.binary) #we create a new pulse with the fused intervals
-            pulse=Pulse(status[1][0],status[1][1],self.binary)
-            self.pb_pulses.append(pulse_pb)
-            self.pulses.append(pulse) 
-            print(f"pb_pulses added: {pulse_pb.start_tail}, {pulse_pb.end_tail}")
+            new_pulse_pb=Pulse(status[0][0],status[0][1],self.binary) #we create a new pulse with the fused intervals
+            new_pulse=Pulse(status[1][0],status[1][1],self.binary)
+            self.pb_pulses.append(new_pulse_pb)
+            self.pulses.append(new_pulse) 
+            print(f"pb_pulses added: {new_pulse_pb.start_tail}, {new_pulse_pb.end_tail}")
         else: 
             self.pb_pulses.append(pulse_pb)
             self.pulses.append(pulse) 
@@ -71,7 +71,7 @@ class Sequence(QObject): #A sequence per iteration ( 1 frame), QObject allows si
             indexes_delete=[] #indexes we will delete later
             for j in range(len(self.pb_pulses)): #we iterate over the pb_pulses in the respective channel, to check for overlapping
                 Partially_Left=False
-                Partially_Rigth=False
+                Partially_Right=False
                 Completely_Inside=False
                 Completely_Ontop=False
                 #print(f"pb_pulses per iteration{j}: {self.pb_pulses[j].start_tail}, {self.pb_pulses[j].end_tail}")
@@ -95,7 +95,7 @@ class Sequence(QObject): #A sequence per iteration ( 1 frame), QObject allows si
                     global_fusion_pb.append(fused_pulse_pb)
                     global_fusion.append(fused_pulse)
                     overlap_fixed_pulses=True
-                    print(f"Partially Right")
+                    print(f"Partially Right pulse:{fused_pulse}")
 
                 elif Completely_Inside==True:
                     fused_pulse_pb=[self.pb_pulses[j].start_tail,self.pb_pulses[j].end_tail]
@@ -113,11 +113,13 @@ class Sequence(QObject): #A sequence per iteration ( 1 frame), QObject allows si
                     overlap_fixed_pulses=True
                     print(f"Completely Ontop")
                     #now we delete the pulses that we fused, so they dont overlap with the new pulse    
-                if overlap_fixed_pulses==True:
+                if Partially_Left==True or Partially_Right or Completely_Inside==True or Completely_Ontop:
                     indexes_delete.append(j) 
+                    print(f"index to delete{j}")
 
             if len(global_fusion_pb)>0: #we fuse everything that was fused
                 fused_pulse_pb=self.fuse_pulses(global_fusion_pb) # we find the biggest pulse t
+                print(f"GLobal_fused_pulse:{global_fusion_pb} and fuse pulses:{fused_pulse_pb}")
                 fused_pulse=self.fuse_pulses(global_fusion)
                 for index in sorted(indexes_delete, reverse=True): 
                     """
@@ -125,8 +127,10 @@ class Sequence(QObject): #A sequence per iteration ( 1 frame), QObject allows si
                       is used in the sorted() function to sort the indices in 
                       descending order (from largest to smallest). This ensures that
                         when you delete elements from the list using their indices, you start 
-                        with the largest index first.
+                        with the largest index first. 
+                        here we run with a typical 
                     """
+                    print(f"pulse to be deleted:{self.pb_pulses[index].start_tail,self.pb_pulses[index].end_tail}")
                     del self.pb_pulses[index]
                     del self.pulses[index]
 

@@ -52,6 +52,8 @@ class Channel(QObject):
                 """generator expression: enumerate provides both the index and the element while iteratinf throught the list. next() efficiently 
                 finds the first match without iterating through the entire list"""
                 index = next((j for j, sequence in enumerate(self.Sequence_hub) if sequence.iteration == k), None)
+                print(f"index:{index}")
+                
                 #calcualte the width for this current iteration
                 new_width=width
                 if function_string!="":
@@ -73,14 +75,14 @@ class Channel(QObject):
                     #error: because when i=1 after i=0 a Sequence is created but it's on sequence_hub[0] thus sequence_hub[1] will be out of range
                 elif self.Sequence_hub[index].iteration==k: #this means there is already a sequence for this iteration
                     print(f"sequence edited in {k}")
-                    self.Sequence_hub[k].add_pulse(start_time, new_width,self.delay[0],self.delay[1]) #we add the pulse to the sequence)
+                    self.Sequence_hub[index].add_pulse(start_time, new_width,self.delay[0],self.delay[1]) #we add the pulse to the sequence)
                     
            
             self.Sequence_hub = sorted(self.Sequence_hub, key=lambda sequence: sequence.iteration) # Sort (order) the  self.Sequence_hub list by the `iteration` attribute
-
         else: #meaning we are editing an existing pulse
 
             pass #leave this for later
+
     def a_experiment(self,i):
         """ if we find a sequence for the iteration i we return the values if not we return None. 
             This method is mainly to fetch data for the experiment"""
