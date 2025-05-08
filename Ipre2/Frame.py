@@ -11,7 +11,7 @@ class Frame(QObject):
     """
     def __init__(self,channel_tags_colors,sequences,iteration,max_end):
         super().__init__()
-        self.channel_tags_colors=channel_tags_colors
+        self.channel_tags_colors=channel_tags_colors #[channel.tag,channel.label]
         self.sequences=sequences
         self.iteration=iteration
         self.PlotSequences=[]
@@ -36,6 +36,25 @@ class Frame(QObject):
                 if pulse.end_tail > global_end:
                     global_end = pulse.end_tail
         for i, seq in enumerate(self.sequences):
+            color=self.channel_tags_colors[i][1]
+            if color=="red":
+                color='r'
+            elif color=="green":
+                color='g'
+            elif color=="yellow":
+                color='yellow'
+            elif color=="orange":
+                color='#FF5733'
+            elif color=="blue":
+                color='blue'
+            elif color=="pink":
+                color='pink'
+            elif color=="white":
+                color='white'
+            elif color=="apd":
+                color='orange'
+            elif color=="microwave": 
+                color='microwave'
             x = []  # x-axis values (time)
             y = []  # y-axis values (level for Heaviside + offset)
 
@@ -65,7 +84,7 @@ class Frame(QObject):
 
                 # Falling edge: step down at end
                 x.append(pulse.end_tail)
-                #y.append(offset)
+                y.append(offset)
 
                 last_end = pulse.end_tail  # Update the last end for gap checking
             # If the last pulse ends before the global end, extend the flat line
@@ -75,12 +94,14 @@ class Frame(QObject):
             # Optionally, draw a flat tail after the last pulse
             #x.append(last_end + 1)
             #y.append(offset)
-        
+            # Ensure x has one more element than y
+            x.append(global_end)
+            #y.append(offset)
             # Create a PlotDataItem with step mode to mimic Heaviside function
             plot_item = pg.PlotDataItem(
                 x, y,
                 stepMode=True,       # Important for square wave behavior
-                pen=pg.mkPen(width=2)  # Line thickness
+                pen={'color': color,'width':2}  # Line thickness
             )
 
             # Add the pulse trace to frame list 

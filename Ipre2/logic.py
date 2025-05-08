@@ -46,7 +46,7 @@ class PulseManagerLogic(QObject):
         
         if channel_tag not in self.added_channel_tags:  # Check if channel is already added, #flag[0]
             # This is for the Graphs in the Sequence Plot
-            if channel_label in ["green", "yellow", "red", "apd", "microwave"]:
+            if channel_label in ["green", "yellow", "red", "apd", "microwave","blue","pink","orange"]:
                 flag_str = f"channel: {flag[0]}, delay_on: {abs(flag[1][0])}, delay_off: {abs(flag[1][1])}, {flag[2]}"  # Convert list to string
                 self.adding_flag_to_list.emit(flag_str) #emit the signal to the GUI
                 channel_binary=self.convert_to_binary(channel_tag,channel_count)#channel count is the amount of ports in the ni
