@@ -19,8 +19,6 @@ class Sequence(QObject): #A sequence per iteration ( 1 frame), QObject allows si
 
 
     ######   ••••••ADDING A PULSE •••••••
-    error_adding_pulse=Signal(str)
-    error_signal=Signal()
     def add_pulse(self, start_time,width,delay_on,delay_off): 
         end_tail=start_time+width
         start_tail=start_time

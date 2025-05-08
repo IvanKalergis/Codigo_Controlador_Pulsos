@@ -21,7 +21,7 @@ Mayor change to the UI file:
     Also want to change the ui, to have the photo frames and the simulation in the same graph
 
 To convert ui to py:
-    - cd /Users/ivankalergis/Documents/GitHub/Codig_Controlador_Pulsos/Nuevo_intento
+    - cd /Users/ivankalergis/Documents/GitHub/Codig_Controlador_Pulsos/Ipre2
     - /Users/ivankalergis/Library/Python/3.8/bin/pyside2-uic General_Pulses.ui -o Sequence_one.py
 
 Task: tipo de programmacion de entradas y salidas de la NIH
@@ -33,3 +33,5 @@ Lo que queda:
     Generar grafico intensidad por tiempo de las cuentas recibidas cuentas por segundo eje y tiempo eje x
     generar las iteraciones de los pulsos partiendo de 1 en vex de 0
     Cuando apreto Stop_Experiment debo también parar la toma de cuentas del apd?
+    edit the start time of an already added pulse
+        when changing the option of Type_Change to type=1, allow the Pulses_box to show the options of each pulse

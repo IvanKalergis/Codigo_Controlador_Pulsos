@@ -215,10 +215,10 @@
     <widget class="QWidget" name="verticalLayoutWidget">
      <property name="geometry">
       <rect>
-       <x>0</x>
-       <y>30</y>
-       <width>382</width>
-       <height>261</height>
+       <x>10</x>
+       <y>40</y>
+       <width>371</width>
+       <height>221</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
@@ -247,145 +247,147 @@
        </layout>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_3">
-          <item>
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>Channel:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QComboBox" name="Channel_Pulse">
-            <item>
-             <property name="text">
-              <string>N</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB0</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB1</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB2</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB3</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB4</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB5</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB6</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB7</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB8</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB9</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB10</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB11</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB12</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB13</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB14</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB15</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB16</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB17</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB18</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB19</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>PB20</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </item>
-      <item>
        <layout class="QHBoxLayout" name="horizontalLayout_11">
         <item>
-         <widget class="QLabel" name="label_10">
+         <widget class="QLabel" name="label_3">
           <property name="text">
-           <string>Vary a pulse width:</string>
+           <string>Channel:</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="Pulses_box"/>
+         <widget class="QComboBox" name="Channel_Pulse">
+          <item>
+           <property name="text">
+            <string>N</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>PB0</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>PB1</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>PB2</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>PB3</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>PB4</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>PB5</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>PB6</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>PB7</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>PB8</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>PB9</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>PB10</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>PB11</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>PB12</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>PB13</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>PB14</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>PB15</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>PB16</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>PB17</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>PB18</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>PB19</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>PB20</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_10">
+          <property name="text">
+           <string>f(S,i):</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="Function_Start">
+          <property name="maximumSize">
+           <size>
+            <width>71</width>
+            <height>21</height>
+           </size>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QLabel" name="label_7">
@@ -396,12 +398,12 @@
            </size>
           </property>
           <property name="text">
-           <string>f:(W*i)</string>
+           <string>f(W,i):</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="Function">
+         <widget class="QLineEdit" name="Function_Width">
           <property name="maximumSize">
            <size>
             <width>71</width>
@@ -454,37 +456,6 @@
             <height>24</height>
            </size>
           </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_12">
-        <item>
-         <widget class="QLabel" name="label_13">
-          <property name="text">
-           <string>Type:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="Type_Change">
-          <property name="minimumSize">
-           <size>
-            <width>321</width>
-            <height>26</height>
-           </size>
-          </property>
-          <item>
-           <property name="text">
-            <string>Add new pulse (and/or vary width per i)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Edit added pulse (and/or vary start time per i)</string>
-           </property>
-          </item>
          </widget>
         </item>
        </layout>

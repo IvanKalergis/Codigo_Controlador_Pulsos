@@ -52,6 +52,13 @@ class Window(QWidget,Ui_Form):
         self.PML.error_str_signal.connect(self.show_error_message)
         self.ui.Add_Pulse.clicked.connect(self.add_pulse_gui)
         self.ui.Iterations_start.valueChanged.connect(self.set_max)
+
+        ######## Selecting Frame for Display #######
+        self.ui.Iteration_frame.setMinimum(1)
+        self.ui.Iteration_frame.valueChanged.connect(self.Prepare_Frame)
+        self.ui.Update.clicked.connect(self.Prepare_Frame)
+        self.PML.add_frame_to_graph.connect(self.Show_Frame)
+    
         ##### ADDING CHANNELS #####
     def add_channel_gui(self):
         """
@@ -87,20 +94,35 @@ class Window(QWidget,Ui_Form):
         start_time = self.ui.StartTime.value()
         width = self.ui.Puls_Width.value()
         channel_tag = self.ui.Channel_Pulse.currentIndex() #we get the channel from the gui
-        function_str=self.ui.Function.text() #we get the function from the gui
+        function_width=self.ui.Function_Width.text() #we get the function from the gui
+        function_start=self.ui.Function_Start.text()
         iteration_range = [self.ui.Iterations_start.value(),self.ui.Iterations_end.value()]
-        type_change = self.ui.Type_Change.currentIndex()
-        self.PML.add_pulse_to_channel(start_time, width,function_str,iteration_range, channel_tag,type_change)
+        self.PML.add_pulse_to_channel(start_time, width,function_width,function_start,iteration_range, channel_tag)
 
     def set_max(self): # as soon as I change the value fo the Iteration_start, the Iteration _end, allow numbers bigger than the Iterations_start
         self.ui.Iterations_end.setMinimum(self.ui.Iterations_start.value()+1) 
-    
+
+
+
     #### RUN Experiment ####
     def Run_Experiment_Gui(self):
         value_loop=self.ui.Loop_Sequence.value()
         self.PML.Run_experiment(value_loop)
     def Stop_Experiment_Gui(self):
         self.PML.Stop_Experiment()
+
+     ######## Selecting Frame for Display #######
+    def Prepare_Frame(self):
+        Frame_i=self.ui.Iteration_frame.value()
+        self.ui.Sequence_Diagram.clear()
+        self.ui.Sequence_Diagram.enableAutoRange(axis=pg.ViewBox.XAxis, enable=False)
+        self.ui.Sequence_Diagram.setXRange(0, self.PML.Max_end_time, padding=0)  # or whatever fixed length you want
+        self.PML.Prepare_Frame(Frame_i) #this prepares the 
+        #we set the value of the x axis to the largest end time of all the iterations from all the channels
+        
+
+    def Show_Frame(self,sequence):
+        self.ui.Sequence_Diagram.addItem(sequence)
 
     @Slot(str)
     def show_error_message(self, error_str):

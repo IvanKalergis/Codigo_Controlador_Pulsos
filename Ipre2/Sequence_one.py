@@ -140,6 +140,10 @@ class Ui_Form(object):
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.horizontalLayout_3 = QHBoxLayout()
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_3.addItem(self.horizontalSpacer_2)
+
         self.label_3 = QLabel(self.verticalLayoutWidget)
         self.label_3.setObjectName(u"label_3")
 
@@ -185,10 +189,15 @@ class Ui_Form(object):
 
         self.horizontalLayout_11.addWidget(self.label_10)
 
-        self.Pulses_box = QComboBox(self.verticalLayoutWidget)
-        self.Pulses_box.setObjectName(u"Pulses_box")
+        self.Function_Start = QLineEdit(self.verticalLayoutWidget)
+        self.Function_Start.setObjectName(u"Function_Start")
+        self.Function_Start.setMaximumSize(QSize(71, 21))
 
-        self.horizontalLayout_11.addWidget(self.Pulses_box)
+        self.horizontalLayout_11.addWidget(self.Function_Start)
+
+        self.horizontalSpacer = QSpacerItem(58, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_11.addItem(self.horizontalSpacer)
 
         self.label_7 = QLabel(self.verticalLayoutWidget)
         self.label_7.setObjectName(u"label_7")
@@ -196,11 +205,11 @@ class Ui_Form(object):
 
         self.horizontalLayout_11.addWidget(self.label_7)
 
-        self.Function = QLineEdit(self.verticalLayoutWidget)
-        self.Function.setObjectName(u"Function")
-        self.Function.setMaximumSize(QSize(71, 21))
+        self.Function_Width = QLineEdit(self.verticalLayoutWidget)
+        self.Function_Width.setObjectName(u"Function_Width")
+        self.Function_Width.setMaximumSize(QSize(71, 21))
 
-        self.horizontalLayout_11.addWidget(self.Function)
+        self.horizontalLayout_11.addWidget(self.Function_Width)
 
 
         self.verticalLayout.addLayout(self.horizontalLayout_11)
@@ -235,10 +244,6 @@ class Ui_Form(object):
 
         self.horizontalLayout_12 = QHBoxLayout()
         self.horizontalLayout_12.setObjectName(u"horizontalLayout_12")
-        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.horizontalLayout_12.addItem(self.horizontalSpacer)
-
         self.label_13 = QLabel(self.verticalLayoutWidget)
         self.label_13.setObjectName(u"label_13")
 
@@ -248,6 +253,7 @@ class Ui_Form(object):
         self.Type_Change.addItem("")
         self.Type_Change.addItem("")
         self.Type_Change.setObjectName(u"Type_Change")
+        self.Type_Change.setMinimumSize(QSize(321, 26))
 
         self.horizontalLayout_12.addWidget(self.Type_Change)
 
@@ -370,14 +376,15 @@ class Ui_Form(object):
         self.Channel_Pulse.setItemText(20, QCoreApplication.translate("Form", u"PB19", None))
         self.Channel_Pulse.setItemText(21, QCoreApplication.translate("Form", u"PB20", None))
 
-        self.label_10.setText(QCoreApplication.translate("Form", u"Vary a pulse width:", None))
-        self.label_7.setText(QCoreApplication.translate("Form", u"f:(W*i)", None))
-        self.Function.setText("")
+        self.label_10.setText(QCoreApplication.translate("Form", u"f(S,i):", None))
+        self.Function_Start.setText("")
+        self.label_7.setText(QCoreApplication.translate("Form", u"f(W,i):", None))
+        self.Function_Width.setText("")
         self.label_11.setText(QCoreApplication.translate("Form", u"Iteration from:", None))
         self.label_12.setText(QCoreApplication.translate("Form", u"to", None))
         self.label_13.setText(QCoreApplication.translate("Form", u"Type:", None))
-        self.Type_Change.setItemText(0, QCoreApplication.translate("Form", u"Add new pulse, with/without variations", None))
-        self.Type_Change.setItemText(1, QCoreApplication.translate("Form", u"Vary an already added pulse", None))
+        self.Type_Change.setItemText(0, QCoreApplication.translate("Form", u"Add new pulse (and/or vary width per i)", None))
+        self.Type_Change.setItemText(1, QCoreApplication.translate("Form", u"Edit added pulse (and/or vary start time per i)", None))
 
         self.Add_Pulse.setText(QCoreApplication.translate("Form", u"Add", None))
         self.Define_Channels_2.setTitle(QCoreApplication.translate("Form", u"Define Channels", None))
