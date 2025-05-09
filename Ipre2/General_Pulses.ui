@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>906</width>
-    <height>703</height>
+    <width>893</width>
+    <height>676</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,10 +16,10 @@
   <widget class="QGroupBox" name="Sequence_Creation">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>0</y>
+     <x>10</x>
+     <y>-20</y>
      <width>1021</width>
-     <height>711</height>
+     <height>691</height>
     </rect>
    </property>
    <property name="title">
@@ -205,8 +205,8 @@
      <rect>
       <x>480</x>
       <y>400</y>
-      <width>391</width>
-      <height>291</height>
+      <width>381</width>
+      <height>241</height>
      </rect>
     </property>
     <property name="title">
@@ -215,8 +215,8 @@
     <widget class="QWidget" name="verticalLayoutWidget">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>40</y>
+       <x>0</x>
+       <y>20</y>
        <width>371</width>
        <height>221</height>
       </rect>

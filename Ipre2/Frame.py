@@ -106,5 +106,13 @@ class Frame(QObject):
 
             # Add the pulse trace to frame list 
             self.PlotSequences.append(plot_item)
-            #graphWidget.addItem(plot_item)
+            channel_tag = str(self.channel_tags_colors[i][0]) # Assuming the first element is the tag
+            text_item = pg.TextItem(
+                text=channel_tag,
+                color=color,  # Match the text color to the line color
+                anchor=(0, 1)  # Align the text to the top left
+            )
+            text_item.setPos(x[0], offset + 1.25)  # Position the text slightly above the sequence
+            self.PlotSequences.append(text_item)  # Add the TextItem to the sequence list
+
         

@@ -69,7 +69,7 @@ class Channel(QObject):
                 S=start_time
                 i=k-iteration_range[0] + 1 
                 new_start_time=eval(function_start) #varied width
-                print(f"function width:{function_start}, new_width:{new_start_time}")
+                print(f"function start_time:{function_start}, new_start_time:{new_start_time}")
             
             new_end_time=new_start_time+new_width
             if new_end_time>max_end_time:
@@ -96,7 +96,7 @@ class Channel(QObject):
         """ if we find a sequence for the iteration i we return the values if not we return None. 
             This method is mainly to fetch data for the experiment"""
         for seq in self.Sequence_hub: 
-            if seq.iteration==i: 
+            if seq.iteration==i:
                 return seq.pb_pulses #since its for the experiment we only need to do pb_  for this
         return None
     

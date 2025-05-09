@@ -122,9 +122,11 @@ class PulseManagerLogic(QObject):
             then we order the pulses form the channels that have pulses in this iteration. Then we create an object from the  
             class experiment. which we then add to our list Experiment_Hub
         """
-        for i in range(0,value_loop): #we iterate per each iteration of the experiment
+        for i in range(1,value_loop+1): #we iterate per each iteration of the experiment. Iterations start from the value 1
+            print(f"iteration for creation of exp:{i}")
             Exp_i_pb=[]
             for channel in self.channels:
+                print("Inside the channel loop")
                 list_channel_sequence=channel.a_experiment(i)
                 if list_channel_sequence!=None: 
                     Exp_i_pb.append(list_channel_sequence)
@@ -134,6 +136,7 @@ class PulseManagerLogic(QObject):
         """ Con la lista Experiment_hub ya completa, flateamos la lista, y luego le enviamos los pulsos a la pulse Blaster """
         # Flatten all the pulses into one list
         Flat_exp= [pulse for exp in self.Experiment_Hub for pulse in exp.pb_sequence]
+        print(f"len(flat_exp):{Flat_exp}")
 
         self.Send_to_Pulse_Blaster(Flat_exp)
         """"
@@ -187,7 +190,7 @@ class PulseManagerLogic(QObject):
 
 
 
-    # ••••• DISPLAY ••••••••
+    # ••••• DISPLAY Selected Frame ••••••••
     add_frame_to_graph=Signal(pg.PlotDataItem)
     def Prepare_Frame(self,frame_i):
         """Each time we change the value of the frame, it shows the corresponding frame in the graph
@@ -206,7 +209,61 @@ class PulseManagerLogic(QObject):
         sequence_for_graph=frame.PlotSequences
         for sequence_frame in sequence_for_graph:
             self.add_frame_to_graph.emit(sequence_frame)
-        
+    
+    
+    # ••••• DISPLAY a simulation of all frames ••••••••
+    next_frame_signal=Signal(int)
+    def Run_Simulation(self,initial_frame,value_loop,ms_value):
+        """
+        Starts or stops the simulation when the button is clicked.
+        """
+        # Check if the timer is already running Use hasattr(self, 'timer') to ensure the self.timer attribute exists before calling isActive().
+        if hasattr(self, 'timer') and self.timer.isActive():
+            # Stop the timer if it's running
+            self.timer.stop()
+            self.iteration = initial_frame  # Reset the iteration counter
+            print("Simulation stopped.")
+        else:
+            """The timeout signal of QTimer does not pass any arguments 
+                when it is emitted. However, the update_simulation method
+                  requires two arguments: initial_frame and value_loop. 
+                  To bridge this gap, a lambda function is used to wrap 
+                  the call to update_simulation and provide the required
+                    arguments.The lambda creates an anonymous function that
+                      calls self.update_simulation(initial_frame, value_loop) 
+                      whenever the timeout signal is emitted.
+
+            """
+            # Initialize iteration counter
+            self.iteration = initial_frame  # Current iteration
+            # Set up a timer to update the plot
+            self.timer = QTimer()
+            self.timer.timeout.connect(lambda: self.update_simulation(initial_frame, value_loop))
+            self.timer.start(ms_value)  # Update at the specified interval
+            print("Simulation started.")
+    add_iteration_txt=Signal(str)
+    def update_simulation(self,initial_frame,value_loop):
+        if self.iteration<value_loop:
+            self.iteration= self.iteration +1 #we add one to the the iteration of the dinamic graph
+            self.next_frame_signal.emit(self.iteration)
+            self.add_iteration_txt.emit(f"current iteration: ({self.iteration})")
+        else: 
+            self.timer.stop()
+
+            self.iteration = initial_frame
+            print("Simulation Stopped")
+            self.next_frame_signal.emit(self.iteration)
+            self.add_iteration_txt.emit(f"current iteration: ()")
+    
+
+    ####### CLEARING GUI #########
+    def Clearing_Gui(self):
+        self.added_channel_tags= [] 
+        self.channels = []
+        self.channel_labels = [] 
+        self.Delays_channel = [] 
+        self.Experiment_Hub=[] 
+        self.Max_end_time =0 
 
 
         

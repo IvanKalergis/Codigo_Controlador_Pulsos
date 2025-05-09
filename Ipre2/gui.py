@@ -58,7 +58,13 @@ class Window(QWidget,Ui_Form):
         self.ui.Iteration_frame.valueChanged.connect(self.Prepare_Frame)
         self.ui.Update.clicked.connect(self.Prepare_Frame)
         self.PML.add_frame_to_graph.connect(self.Show_Frame)
-    
+
+        ####### Run Simulation ########
+        self.ui.Stop_Simulation.clicked.connect(self.Start_Simulation)
+        self.PML.next_frame_signal.connect(self.Prepare_next_Frame_Simulation)
+        self.PML.add_iteration_txt.connect(self.add_iteration_text)
+        ###### Clear Gui #######
+        self.ui.Clear_Channels.clicked.connect(self.Clear_Gui())
         ##### ADDING CHANNELS #####
     def add_channel_gui(self):
         """
@@ -118,12 +124,37 @@ class Window(QWidget,Ui_Form):
         self.ui.Sequence_Diagram.enableAutoRange(axis=pg.ViewBox.XAxis, enable=False)
         self.ui.Sequence_Diagram.setXRange(0, self.PML.Max_end_time, padding=0)  # or whatever fixed length you want
         self.PML.Prepare_Frame(Frame_i) #this prepares the 
-        #we set the value of the x axis to the largest end time of all the iterations from all the channels
-        
+        #we set the value of the x axis to the largest end time of all the iterations from all the channel
 
     def Show_Frame(self,sequence):
         self.ui.Sequence_Diagram.addItem(sequence)
 
+    ####### Simulation #######
+    def Start_Simulation(self):
+        initial_frame=self.ui.Iteration_frame.value()
+        print(f"initial frame:{initial_frame}")
+        ms=self.ui.ms.value()
+        print(f"ms:{ms}")
+        value_loop=self.ui.Loop_Sequence.value()
+        print(f"value_loop: {value_loop}")
+        self.PML.Run_Simulation(initial_frame,value_loop,ms)
+        # Disable the button after click
+    def Prepare_next_Frame_Simulation(self,Frame_i):
+        self.ui.Sequence_Diagram.clear()
+        self.ui.Sequence_Diagram.enableAutoRange(axis=pg.ViewBox.XAxis, enable=False)
+        self.ui.Sequence_Diagram.setXRange(0, self.PML.Max_end_time, padding=0)  # or whatever fixed length you want
+        self.PML.Prepare_Frame(Frame_i) #this prepares the 
+    def add_iteration_text(self,text):
+        self.ui.current_iteration.setText(text)
+    
+    ###### CLearing Gui ######
+    def Clear_Gui(self):
+        self.ui.Channel_List.clear()
+        self.ui.Sequence_Diagram.clear()
+        self.ui.Duration_Loop.setText("Duration: ( )")
+        self.ui.current_iteration.setText("current iteration: ( )")
+        self.PML.Clearing_Gui()
+        
     @Slot(str)
     def show_error_message(self, error_str):
         """

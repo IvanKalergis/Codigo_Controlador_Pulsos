@@ -19,10 +19,10 @@ class Ui_Form(object):
     def setupUi(self, Form):
         if not Form.objectName():
             Form.setObjectName(u"Form")
-        Form.resize(906, 703)
+        Form.resize(893, 676)
         self.Sequence_Creation = QGroupBox(Form)
         self.Sequence_Creation.setObjectName(u"Sequence_Creation")
-        self.Sequence_Creation.setGeometry(QRect(20, 0, 1021, 711))
+        self.Sequence_Creation.setGeometry(QRect(10, -20, 1021, 691))
         self.horizontalLayoutWidget = QWidget(self.Sequence_Creation)
         self.horizontalLayoutWidget.setObjectName(u"horizontalLayoutWidget")
         self.horizontalLayoutWidget.setGeometry(QRect(20, 30, 347, 51))
@@ -104,10 +104,10 @@ class Ui_Form(object):
         self.Duration_Loop.setGeometry(QRect(660, 290, 161, 19))
         self.Define_Pulse = QGroupBox(self.Sequence_Creation)
         self.Define_Pulse.setObjectName(u"Define_Pulse")
-        self.Define_Pulse.setGeometry(QRect(480, 400, 391, 291))
+        self.Define_Pulse.setGeometry(QRect(480, 400, 381, 241))
         self.verticalLayoutWidget = QWidget(self.Define_Pulse)
         self.verticalLayoutWidget.setObjectName(u"verticalLayoutWidget")
-        self.verticalLayoutWidget.setGeometry(QRect(0, 30, 382, 261))
+        self.verticalLayoutWidget.setGeometry(QRect(0, 20, 371, 221))
         self.verticalLayout = QVBoxLayout(self.verticalLayoutWidget)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
@@ -136,18 +136,12 @@ class Ui_Form(object):
 
         self.verticalLayout.addLayout(self.horizontalLayout)
 
-        self.horizontalLayout_2 = QHBoxLayout()
-        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.horizontalLayout_3 = QHBoxLayout()
-        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.horizontalLayout_3.addItem(self.horizontalSpacer_2)
-
+        self.horizontalLayout_11 = QHBoxLayout()
+        self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
         self.label_3 = QLabel(self.verticalLayoutWidget)
         self.label_3.setObjectName(u"label_3")
 
-        self.horizontalLayout_3.addWidget(self.label_3)
+        self.horizontalLayout_11.addWidget(self.label_3)
 
         self.Channel_Pulse = QComboBox(self.verticalLayoutWidget)
         self.Channel_Pulse.addItem("")
@@ -174,16 +168,8 @@ class Ui_Form(object):
         self.Channel_Pulse.addItem("")
         self.Channel_Pulse.setObjectName(u"Channel_Pulse")
 
-        self.horizontalLayout_3.addWidget(self.Channel_Pulse)
+        self.horizontalLayout_11.addWidget(self.Channel_Pulse)
 
-
-        self.horizontalLayout_2.addLayout(self.horizontalLayout_3)
-
-
-        self.verticalLayout.addLayout(self.horizontalLayout_2)
-
-        self.horizontalLayout_11 = QHBoxLayout()
-        self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
         self.label_10 = QLabel(self.verticalLayoutWidget)
         self.label_10.setObjectName(u"label_10")
 
@@ -194,10 +180,6 @@ class Ui_Form(object):
         self.Function_Start.setMaximumSize(QSize(71, 21))
 
         self.horizontalLayout_11.addWidget(self.Function_Start)
-
-        self.horizontalSpacer = QSpacerItem(58, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.horizontalLayout_11.addItem(self.horizontalSpacer)
 
         self.label_7 = QLabel(self.verticalLayoutWidget)
         self.label_7.setObjectName(u"label_7")
@@ -241,24 +223,6 @@ class Ui_Form(object):
 
 
         self.verticalLayout.addLayout(self.horizontalLayout_9)
-
-        self.horizontalLayout_12 = QHBoxLayout()
-        self.horizontalLayout_12.setObjectName(u"horizontalLayout_12")
-        self.label_13 = QLabel(self.verticalLayoutWidget)
-        self.label_13.setObjectName(u"label_13")
-
-        self.horizontalLayout_12.addWidget(self.label_13)
-
-        self.Type_Change = QComboBox(self.verticalLayoutWidget)
-        self.Type_Change.addItem("")
-        self.Type_Change.addItem("")
-        self.Type_Change.setObjectName(u"Type_Change")
-        self.Type_Change.setMinimumSize(QSize(321, 26))
-
-        self.horizontalLayout_12.addWidget(self.Type_Change)
-
-
-        self.verticalLayout.addLayout(self.horizontalLayout_12)
 
         self.horizontalLayout_17 = QHBoxLayout()
         self.horizontalLayout_17.setObjectName(u"horizontalLayout_17")
@@ -382,10 +346,6 @@ class Ui_Form(object):
         self.Function_Width.setText("")
         self.label_11.setText(QCoreApplication.translate("Form", u"Iteration from:", None))
         self.label_12.setText(QCoreApplication.translate("Form", u"to", None))
-        self.label_13.setText(QCoreApplication.translate("Form", u"Type:", None))
-        self.Type_Change.setItemText(0, QCoreApplication.translate("Form", u"Add new pulse (and/or vary width per i)", None))
-        self.Type_Change.setItemText(1, QCoreApplication.translate("Form", u"Edit added pulse (and/or vary start time per i)", None))
-
         self.Add_Pulse.setText(QCoreApplication.translate("Form", u"Add", None))
         self.Define_Channels_2.setTitle(QCoreApplication.translate("Form", u"Define Channels", None))
         self.Add_Channel.setText(QCoreApplication.translate("Form", u"Add", None))
