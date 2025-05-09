@@ -16,9 +16,20 @@ from PySide2.QtGui import QPen,QColor
 import pyqtgraph as pg #para los gráficos de las secuencias
 import numpy as np
 from PySide2.QtCore import QObject , Signal
-
+#for the pulse blaster
 #import spinapi
 #from spinapi import Inst, LOOP, CONTINUE, END_LOOP, STOP
+#for the NI
+import nidaqmx
+from nidaqmx.constants import (
+                                VoltageUnits,
+                                AcquisitionType, 
+                                TimeUnits, 
+                                Level, 
+                                Edge, 
+                                CountDirection,
+                                TriggerType
+    )
 
 class PulseManagerLogic(QObject):
 
@@ -33,6 +44,9 @@ class PulseManagerLogic(QObject):
         self.Delays_channel = [] # Find a way to get rid of these extra variables
         self.Experiment_Hub=[] # list of objects were each object is a 
         self.Max_end_time =0 # It gives you the max end time of all iterations
+        self.dev = 'Dev1' #el device con su number
+        self.counter_pin = 'ctr0' #ctr= counter basicamente una parte de la nih que cuenta o emite cuentas. El gate le dice en que intervalo contar
+        self.gate_pin = 'PFI9'
 
     ##### Adding a channel ####
     adding_flag_to_list=Signal(str)
@@ -143,7 +157,17 @@ class PulseManagerLogic(QObject):
         Here we should add a fucntion to recieve the photon count
         
         """
-        #spinapi.pb_start()
+        """counter=self.create_counter_task()
+        counter.start()
+        timeout = (value_loop*10*1.2) #el el timepo total del experimento *1.2
+        spinapi.pb_start()
+        for channel in self.channels:
+            if channel.label=='apd':
+                counts = counter.read(value_loop,timeout=timeout)
+                count_0=counts[0]
+                counts = np.diff(counts) # instead of accumulating values ex (5,11,21) it gives (5,6,10)
+                print(counts)"""
+       
         
 
 
@@ -182,7 +206,35 @@ class PulseManagerLogic(QObject):
         print(f"spinapi.pb_stop_programming()")
         #spinapi.pb_reset() 
         pass 
+    # To recieve the counts from the apd
+    def create_counter_task(self):
+        """
+        Todo este task es para la ni"""
+        #creamos el task que lee las cuentas
+        counter_task=nidaqmx.Task(new_task_name='T1 APD fluorescence counts') # crear el task
+        #En que canal recivir las cuentas y bajo que condiciones
+        counter_task.ci_channels.add_ci_count_edges_chan(
+            counter=self.dev + '/' + self.counter_pin, #pin APD en la ni, en este caso seria pin 8
+            name_to_assign_to_channel='APD',
+            edge= Edge.RISING,
+            initial_count=0,
+            count_direction=CountDirection.COUNT_UP
+        ) #ci=counter input, edges cuenta cada vez que hay una subida o bajada de una señal
+        #el cuando recibir las cuentas
+        counter_task.timing.cfg_samp_clk_timing(
+            rate=100,
+            source='/' + self.dev + '/' + self.gate_pin,#cuenta segu cuando llegan las señales del gate
+            active_edge=Edge.FALLING, # empieza acontar cuando la señal gate baja
+            sample_mode=AcquisitionType.CONTINUOUS,
+            samps_per_chan=100000)
+        #una continuiacion de lo de arriba
+        counter_task.triggers.pause_trigger.dig_lvl_src=self.gate_pin
+        counter_task.triggers.pause_trigger.dig_lvl_when=Level.LOW # que pause de contar cuando este en low
+        counter_task.triggers.pause_trigger.trig_type=TriggerType.DIGITAL_LEVEL
 
+        return counter_task
+        
+        
     def Stop_Experiment(self): 
         """spinapi.pb_stop() #stop de program
         spinapi.pb_close() # close the pusle blaster, becasue when you want to open it again it must be close for this"""
@@ -264,6 +316,10 @@ class PulseManagerLogic(QObject):
         self.Delays_channel = [] 
         self.Experiment_Hub=[] 
         self.Max_end_time =0 
+        self.dev = 'Dev1' 
+        self.counter_pin = 'ctr0' 
+        self.gate_pin = 'PFI9'
+
 
 
         
