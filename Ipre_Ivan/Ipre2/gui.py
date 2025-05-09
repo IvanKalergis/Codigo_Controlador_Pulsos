@@ -30,14 +30,15 @@ class Window(QWidget,Ui_Form):
         self.ui.Puls_Width.setMaximum(1000000)
         self.ui.Puls_Width.setMinimum(0)
         self.ui.Puls_Width.setMinimum(1)
-        self.ui.Iterations_start.setMaximum(1000000)
+        self.ui.Iterations_start.setMaximum(100000)
         self.ui.Iterations_start.setMinimum(1) 
-        self.ui.Iterations_end.setMaximum(1000000)
+        self.ui.Iterations_end.setMaximum(100000)
         self.ui.Iterations_end.setValue(5)
         self.ui.Iterations_end.setMinimum(self.ui.Iterations_start.value()+1) 
         self.ui.ms.setMaximum(1000000)
         self.ui.ms.setMinimum(1)
         self.ui.Loop_Sequence.setValue(1)
+        self.ui.Loop_Sequence.setMaximum(1000000000)
         self.ui.ms.setValue(500) # a normal speed
         self.ui.Run_Sequence.clicked.connect(self.Run_Experiment_Gui)
         self.ui.Stop_Sequence.clicked.connect(self.Stop_Experiment_Gui)
@@ -113,7 +114,8 @@ class Window(QWidget,Ui_Form):
     #### RUN Experiment ####
     def Run_Experiment_Gui(self):
         value_loop=self.ui.Loop_Sequence.value()
-        self.PML.Run_experiment(value_loop)
+        Type=self.ui.Type_Variation.currentIndex()
+        self.PML.Run_experiment(value_loop,Type)
     def Stop_Experiment_Gui(self):
         self.PML.Stop_Experiment()
 

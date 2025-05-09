@@ -25,47 +25,11 @@
    <property name="title">
     <string>Pulse Blaster Experiment</string>
    </property>
-   <widget class="QWidget" name="horizontalLayoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>30</y>
-      <width>347</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout_5">
-     <item>
-      <widget class="QLabel" name="label_6">
-       <property name="text">
-        <string>Loop: </string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QSpinBox" name="Loop_Sequence"/>
-     </item>
-     <item>
-      <widget class="QPushButton" name="Run_Sequence">
-       <property name="text">
-        <string>Run</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="Stop_Sequence">
-       <property name="text">
-        <string>Stop</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
    <widget class="QGroupBox" name="groupBox_2">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>80</y>
+      <x>10</x>
+      <y>100</y>
       <width>851</width>
       <height>321</height>
      </rect>
@@ -93,7 +57,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Channels on each iteration: </string>
+      <string>Channels on each Variation: </string>
      </property>
     </widget>
     <widget class="QSpinBox" name="Iteration_frame">
@@ -157,7 +121,7 @@
       <item>
        <widget class="QLabel" name="label_14">
         <property name="text">
-         <string>ms per iteration:</string>
+         <string>ms per Variation:</string>
         </property>
        </widget>
       </item>
@@ -183,7 +147,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>current iteration: ( )</string>
+      <string>current variation: ( )</string>
      </property>
     </widget>
     <widget class="QLabel" name="Duration_Loop">
@@ -203,10 +167,10 @@
    <widget class="QGroupBox" name="Define_Pulse">
     <property name="geometry">
      <rect>
-      <x>480</x>
-      <y>400</y>
+      <x>450</x>
+      <y>420</y>
       <width>381</width>
-      <height>241</height>
+      <height>231</height>
      </rect>
     </property>
     <property name="title">
@@ -217,8 +181,8 @@
       <rect>
        <x>0</x>
        <y>20</y>
-       <width>371</width>
-       <height>221</height>
+       <width>381</width>
+       <height>201</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
@@ -428,7 +392,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Iteration from:</string>
+           <string>Variation from:</string>
           </property>
          </widget>
         </item>
@@ -484,9 +448,9 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>400</y>
+      <y>420</y>
       <width>381</width>
-      <height>281</height>
+      <height>271</height>
      </rect>
     </property>
     <property name="title">
@@ -738,6 +702,111 @@
       <string>Type:</string>
      </property>
     </widget>
+   </widget>
+   <widget class="QSpinBox" name="Loop_Sequence">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>50</y>
+      <width>141</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>191</width>
+      <height>24</height>
+     </size>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_6">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>38</y>
+      <width>211</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Loop each Varition of experiment: </string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_9">
+    <property name="geometry">
+     <rect>
+      <x>370</x>
+      <y>50</y>
+      <width>60</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>times</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="Type_Variation">
+    <property name="geometry">
+     <rect>
+      <x>430</x>
+      <y>50</y>
+      <width>371</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>Forma A: Loop x amount each variation independently</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Forma B: Loop x amount the varaitions consecutively</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Forma C: Loop x amount of the variations randomly</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QPushButton" name="Stop_Sequence">
+    <property name="geometry">
+     <rect>
+      <x>510</x>
+      <y>80</y>
+      <width>81</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>81</width>
+      <height>32</height>
+     </size>
+    </property>
+    <property name="text">
+     <string>Stop</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="Run_Sequence">
+    <property name="geometry">
+     <rect>
+      <x>430</x>
+      <y>80</y>
+      <width>81</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>81</width>
+      <height>32</height>
+     </size>
+    </property>
+    <property name="text">
+     <string>Run</string>
+    </property>
    </widget>
   </widget>
  </widget>

@@ -3,17 +3,17 @@ import pyqtgraph as pg
 class Frame(QObject):
     """
     This class corresponds to the architecture of a frame
-      of the graph for a particular iteration. It recieves 
-      max_end time of al the iterations, because otherwise 
+      of the graph for a particular variation. It recieves 
+      max_end time of al the variation, because otherwise 
       as you create frames the pulses to the user might seem 
       to change even though they are fixed because of having each 
       frame a different end time. 
     """
-    def __init__(self,channel_tags_colors,sequences,iteration,max_end):
+    def __init__(self,channel_tags_colors,sequences,variation,max_end):
         super().__init__()
         self.channel_tags_colors=channel_tags_colors #[channel.tag,channel.label]
         self.sequences=sequences
-        self.iteration=iteration
+        self.variation=variation
         self.PlotSequences=[]
         
     """def Display_Frame(self):

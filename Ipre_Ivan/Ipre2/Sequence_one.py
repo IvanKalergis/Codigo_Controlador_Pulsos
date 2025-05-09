@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'General_Pulses.ui'
+## Form generated from reading UI file 'General_Pulses_2.ui'
 ##
 ## Created by: Qt User Interface Compiler version 5.15.2
 ##
@@ -23,35 +23,9 @@ class Ui_Form(object):
         self.Sequence_Creation = QGroupBox(Form)
         self.Sequence_Creation.setObjectName(u"Sequence_Creation")
         self.Sequence_Creation.setGeometry(QRect(10, -20, 1021, 691))
-        self.horizontalLayoutWidget = QWidget(self.Sequence_Creation)
-        self.horizontalLayoutWidget.setObjectName(u"horizontalLayoutWidget")
-        self.horizontalLayoutWidget.setGeometry(QRect(20, 30, 347, 51))
-        self.horizontalLayout_5 = QHBoxLayout(self.horizontalLayoutWidget)
-        self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
-        self.horizontalLayout_5.setContentsMargins(0, 0, 0, 0)
-        self.label_6 = QLabel(self.horizontalLayoutWidget)
-        self.label_6.setObjectName(u"label_6")
-
-        self.horizontalLayout_5.addWidget(self.label_6)
-
-        self.Loop_Sequence = QSpinBox(self.horizontalLayoutWidget)
-        self.Loop_Sequence.setObjectName(u"Loop_Sequence")
-
-        self.horizontalLayout_5.addWidget(self.Loop_Sequence)
-
-        self.Run_Sequence = QPushButton(self.horizontalLayoutWidget)
-        self.Run_Sequence.setObjectName(u"Run_Sequence")
-
-        self.horizontalLayout_5.addWidget(self.Run_Sequence)
-
-        self.Stop_Sequence = QPushButton(self.horizontalLayoutWidget)
-        self.Stop_Sequence.setObjectName(u"Stop_Sequence")
-
-        self.horizontalLayout_5.addWidget(self.Stop_Sequence)
-
         self.groupBox_2 = QGroupBox(self.Sequence_Creation)
         self.groupBox_2.setObjectName(u"groupBox_2")
-        self.groupBox_2.setGeometry(QRect(20, 80, 851, 321))
+        self.groupBox_2.setGeometry(QRect(10, 100, 851, 321))
         self.Sequence_Diagram = PlotWidget(self.groupBox_2)
         self.Sequence_Diagram.setObjectName(u"Sequence_Diagram")
         self.Sequence_Diagram.setGeometry(QRect(10, 60, 831, 221))
@@ -104,10 +78,10 @@ class Ui_Form(object):
         self.Duration_Loop.setGeometry(QRect(660, 290, 161, 19))
         self.Define_Pulse = QGroupBox(self.Sequence_Creation)
         self.Define_Pulse.setObjectName(u"Define_Pulse")
-        self.Define_Pulse.setGeometry(QRect(480, 400, 381, 241))
+        self.Define_Pulse.setGeometry(QRect(450, 420, 381, 231))
         self.verticalLayoutWidget = QWidget(self.Define_Pulse)
         self.verticalLayoutWidget.setObjectName(u"verticalLayoutWidget")
-        self.verticalLayoutWidget.setGeometry(QRect(0, 20, 371, 221))
+        self.verticalLayoutWidget.setGeometry(QRect(0, 20, 381, 201))
         self.verticalLayout = QVBoxLayout(self.verticalLayoutWidget)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
@@ -237,7 +211,7 @@ class Ui_Form(object):
 
         self.Define_Channels_2 = QGroupBox(self.Sequence_Creation)
         self.Define_Channels_2.setObjectName(u"Define_Channels_2")
-        self.Define_Channels_2.setGeometry(QRect(30, 400, 381, 281))
+        self.Define_Channels_2.setGeometry(QRect(30, 420, 381, 271))
         self.Add_Channel = QPushButton(self.Define_Channels_2)
         self.Add_Channel.setObjectName(u"Add_Channel")
         self.Add_Channel.setGeometry(QRect(230, 240, 113, 32))
@@ -294,6 +268,30 @@ class Ui_Form(object):
         self.label_15 = QLabel(self.Define_Channels_2)
         self.label_15.setObjectName(u"label_15")
         self.label_15.setGeometry(QRect(180, 60, 88, 61))
+        self.Loop_Sequence = QSpinBox(self.Sequence_Creation)
+        self.Loop_Sequence.setObjectName(u"Loop_Sequence")
+        self.Loop_Sequence.setGeometry(QRect(220, 50, 141, 21))
+        self.Loop_Sequence.setMaximumSize(QSize(191, 24))
+        self.label_6 = QLabel(self.Sequence_Creation)
+        self.label_6.setObjectName(u"label_6")
+        self.label_6.setGeometry(QRect(10, 38, 211, 41))
+        self.label_9 = QLabel(self.Sequence_Creation)
+        self.label_9.setObjectName(u"label_9")
+        self.label_9.setGeometry(QRect(370, 50, 60, 16))
+        self.Type_Variation = QComboBox(self.Sequence_Creation)
+        self.Type_Variation.addItem("")
+        self.Type_Variation.addItem("")
+        self.Type_Variation.addItem("")
+        self.Type_Variation.setObjectName(u"Type_Variation")
+        self.Type_Variation.setGeometry(QRect(430, 50, 371, 26))
+        self.Stop_Sequence = QPushButton(self.Sequence_Creation)
+        self.Stop_Sequence.setObjectName(u"Stop_Sequence")
+        self.Stop_Sequence.setGeometry(QRect(510, 80, 81, 32))
+        self.Stop_Sequence.setMaximumSize(QSize(81, 32))
+        self.Run_Sequence = QPushButton(self.Sequence_Creation)
+        self.Run_Sequence.setObjectName(u"Run_Sequence")
+        self.Run_Sequence.setGeometry(QRect(430, 80, 81, 32))
+        self.Run_Sequence.setMaximumSize(QSize(81, 32))
 
         self.retranslateUi(Form)
 
@@ -303,15 +301,12 @@ class Ui_Form(object):
     def retranslateUi(self, Form):
         Form.setWindowTitle(QCoreApplication.translate("Form", u"Form", None))
         self.Sequence_Creation.setTitle(QCoreApplication.translate("Form", u"Pulse Blaster Experiment", None))
-        self.label_6.setText(QCoreApplication.translate("Form", u"Loop: ", None))
-        self.Run_Sequence.setText(QCoreApplication.translate("Form", u"Run", None))
-        self.Stop_Sequence.setText(QCoreApplication.translate("Form", u"Stop", None))
         self.groupBox_2.setTitle(QCoreApplication.translate("Form", u"Frames", None))
-        self.current_iteration_2.setText(QCoreApplication.translate("Form", u"Channels on each iteration: ", None))
+        self.current_iteration_2.setText(QCoreApplication.translate("Form", u"Channels on each Variation: ", None))
         self.Stop_Simulation.setText(QCoreApplication.translate("Form", u"Play/Stop", None))
         self.Update.setText(QCoreApplication.translate("Form", u"Update", None))
-        self.label_14.setText(QCoreApplication.translate("Form", u"ms per iteration:", None))
-        self.current_iteration.setText(QCoreApplication.translate("Form", u"current iteration: ( )", None))
+        self.label_14.setText(QCoreApplication.translate("Form", u"ms per Variation:", None))
+        self.current_iteration.setText(QCoreApplication.translate("Form", u"current variation: ( )", None))
         self.Duration_Loop.setText(QCoreApplication.translate("Form", u"Duration: ( )", None))
         self.Define_Pulse.setTitle(QCoreApplication.translate("Form", u"Add pulse to sequence", None))
         self.label.setText(QCoreApplication.translate("Form", u"Start Time:", None))
@@ -344,7 +339,7 @@ class Ui_Form(object):
         self.Function_Start.setText("")
         self.label_7.setText(QCoreApplication.translate("Form", u"f(W,i):", None))
         self.Function_Width.setText("")
-        self.label_11.setText(QCoreApplication.translate("Form", u"Iteration from:", None))
+        self.label_11.setText(QCoreApplication.translate("Form", u"Variation from:", None))
         self.label_12.setText(QCoreApplication.translate("Form", u"to", None))
         self.Add_Pulse.setText(QCoreApplication.translate("Form", u"Add", None))
         self.Define_Channels_2.setTitle(QCoreApplication.translate("Form", u"Define Channels", None))
@@ -385,5 +380,13 @@ class Ui_Form(object):
         self.Channel_Identifier.setItemText(21, QCoreApplication.translate("Form", u"PB20", None))
 
         self.label_15.setText(QCoreApplication.translate("Form", u"Type:", None))
+        self.label_6.setText(QCoreApplication.translate("Form", u"Loop each Varition of experiment: ", None))
+        self.label_9.setText(QCoreApplication.translate("Form", u"times", None))
+        self.Type_Variation.setItemText(0, QCoreApplication.translate("Form", u"Forma A: Loop x amount each variation independently", None))
+        self.Type_Variation.setItemText(1, QCoreApplication.translate("Form", u"Forma B: Loop x amount the varaitions consecutively", None))
+        self.Type_Variation.setItemText(2, QCoreApplication.translate("Form", u"Forma C: Loop x amount of the variations randomly", None))
+
+        self.Stop_Sequence.setText(QCoreApplication.translate("Form", u"Stop", None))
+        self.Run_Sequence.setText(QCoreApplication.translate("Form", u"Run", None))
     # retranslateUi
 

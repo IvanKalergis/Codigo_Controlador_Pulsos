@@ -17,8 +17,8 @@ import pyqtgraph as pg #para los gráficos de las secuencias
 import numpy as np
 from PySide2.QtCore import QObject , Signal
 #for the pulse blaster
-#import spinapi
-#from spinapi import Inst, LOOP, CONTINUE, END_LOOP, STOP
+import spinapi
+from spinapi import Inst, LOOP, CONTINUE, END_LOOP, STOP
 #for the NI
 import nidaqmx
 from nidaqmx.constants import (
@@ -47,6 +47,7 @@ class PulseManagerLogic(QObject):
         self.dev = 'Dev1' #el device con su number
         self.counter_pin = 'ctr0' #ctr= counter basicamente una parte de la nih que cuenta o emite cuentas. El gate le dice en que intervalo contar
         self.gate_pin = 'PFI9'
+        self.max_variations=0
 
     ##### Adding a channel ####
     adding_flag_to_list=Signal(str)
@@ -110,6 +111,8 @@ class PulseManagerLogic(QObject):
     error_str_signal = Signal(str)
     def add_pulse_to_channel(self, start_time, width,function_width,function_start, iteration_range,channel_tag):
         """ here we check if we got a channel to add the pulse, then we call a method of the channels class, that creates a sequence per iteration."""
+        if self.max_variations<iteration_range[1]: #meaning we have new bigger variation 
+            self.max_variations=iteration_range[1]
         #check if we got a channel to add the pulse
         if len(self.channels)==0:
             self.error_str_signal.emit("No channels added")
@@ -130,13 +133,13 @@ class PulseManagerLogic(QObject):
     
 
 
-    def Run_experiment(self,value_loop):
+    def Run_experiment(self,value_loop,Type):
 
         """ here we iterate through each iteration of the loop to find the channels that have a sequence for that iteration 
             then we order the pulses form the channels that have pulses in this iteration. Then we create an object from the  
             class experiment. which we then add to our list Experiment_Hub
         """
-        for i in range(1,value_loop+1): #we iterate per each iteration of the experiment. Iterations start from the value 1
+        for i in range(1,self.max_variations+1):
             print(f"iteration for creation of exp:{i}")
             Exp_i_pb=[]
             for channel in self.channels:
@@ -146,33 +149,80 @@ class PulseManagerLogic(QObject):
                     Exp_i_pb.append(list_channel_sequence)
             exp=Experiment(Exp_i_pb,i)
             exp.Prepare_Exp()
-            self.Experiment_Hub.append(exp)  #since we are going from 0-end loop the exp objects will be ordered
-        """ Con la lista Experiment_hub ya completa, flateamos la lista, y luego le enviamos los pulsos a la pulse Blaster """
-        # Flatten all the pulses into one list
-        Flat_exp= [pulse for exp in self.Experiment_Hub for pulse in exp.pb_sequence]
-        print(f"len(flat_exp):{Flat_exp}")
-
-        self.Send_to_Pulse_Blaster(Flat_exp)
-        """"
-        Here we should add a fucntion to recieve the photon count
+            self.Experiment_Hub.append(exp)
         
-        """
-        """counter=self.create_counter_task()
-        counter.start()
-        timeout = (value_loop*10*1.2) #el el timepo total del experimento *1.2
-        spinapi.pb_start()
-        for channel in self.channels:
-            if channel.label=='apd':
-                counts = counter.read(value_loop,timeout=timeout)
-                count_0=counts[0]
-                counts = np.diff(counts) # instead of accumulating values ex (5,11,21) it gives (5,6,10)
-                print(counts)"""
+        print(f"len(self.Experiment_Hub):{len(self.Experiment_Hub)}")
+        #maybe we shouldnt flat them but instead send self.Experiment
+        if Type==0: 
+            """ here we must iterate each variation a number of value_loop times. we do this for all variations so
+             we need to flatten the pulses for each variation. """
+            
+            self.a_Send_to_pulse_blaster(self.Experiment_Hub,value_loop)
+        if Type==1: 
+            """ lets say we have 3 variations the experiment then becomes (1,2,3)*value_loop times"""
+            # Flatten all the pulses into one list
+            Flat_exp= [pulse for exp in self.Experiment_Hub for pulse in exp.pb_sequence]
+            print("Ready with Flatting")
+            pass
+
+    
        
         
 
+    def a_Send_to_pulse_blaster(self,Experiment_hub,value_loop): 
+        """  here we must iterate each variation a number of value_loop times. we do this for all variations so """
+        spinapi.pb_close()
+        spinapi.pb_select_board(0)
+        if spinapi.pb_init() != 0:
+            #####print("Error initializing board: %s" %pb_get_error())
+            input("Please press a key to continue.")
+            exit(-1)
+        spinapi.pb_reset() 
+        spinapi.pb_core_clock(500)
+        spinapi.pb_start_programming(spinapi.PULSE_PROGRAM)
+        counter=self.create_counter_task()
+        counter.start()
+        ### muc add another for, to diviude the value_loop
+        for j in range(0,self.max_variations):
+            print(f"Starting the {j}th variation")
+            Flat_exp=Experiment_hub[j]
+            spinapi.pb_start_programming(spinapi.PULSE_PROGRAM)
+            #diviid value loop, cada uno 10000
+            start=spinapi.pb_inst_pbonly(int(sum(Flat_exp[0].channel_binary[0])),Inst.LOOP,value_loop,(Flat_exp[0].end_tail-Flat_exp[0].start_tail)*spinapi.us) # generates a loop of instruction here only one iteration
+            print(f"Flat_exp[0].channel_binary:{Flat_exp[0].channel_binary[0]}")
+            print(f"spinapi.pb_inst_pbonly({sum(Flat_exp[0].channel_binary[0])},Inst.LOOP,{value_loop},({Flat_exp[0].end_tail-Flat_exp[0].start_tail})*spinapi.us)") 
+            for i in range(1,len(Flat_exp)):# we start from one because we already did the 0 index
+                if i!=len(Flat_exp) -1: #maybe we need to take the -1
+                    print(f"spinapi.pb_inst_pbonly({sum(list(Flat_exp[i].channel_binary[0]))},Inst.CONTINUE,0,({Flat_exp[i].end_tail-Flat_exp[i].start_tail})*spinapi.us)")
+                    spinapi.pb_inst_pbonly(int(sum(Flat_exp[i].channel_binary[0])),Inst.CONTINUE,0,(Flat_exp[i].end_tail-Flat_exp[i].start_tail)*spinapi.us)
+                else:
+                    print(f"spinapi.pb_inst_pbonly({sum(list(Flat_exp[i].channel_binary[0]))},Inst.CONTINUE,0,({Flat_exp[i].end_tail-Flat_exp[i].start_tail})*spinapi.us)")
+                    spinapi.pb_inst_pbonly(int(sum(Flat_exp[i].channel_binary[0])),Inst.CONTINUE,0,(Flat_exp[i].end_tail-Flat_exp[i].start_tail)*spinapi.us)
+                    print(f"spinapi.pb_inst_pbonly({sum(list(Flat_exp[i].channel_binary[0]))},Inst.END_LOOP,start,{Flat_exp[i].end_tail-Flat_exp[i].start_tail}")
+                    spinapi.pb_inst_pbonly(int(sum(Flat_exp[i].channel_binary[0])),Inst.END_LOOP,start,Flat_exp[i].end_tail-Flat_exp[i].start_tail)
+                spinapi.pb_inst_pbonly(int(0),Inst.STOP,0,1*spinapi.us) # This instruction stops the pulse sequence. The duration is set to a very small value to ensure the stop instruction is executed almost immediately.
+                print(f"spinapi.pb_inst_pbonly(int(0),Inst.STOP,0,0.01*spinapi.us)")
+                spinapi.pb_stop_programming()  # This function call signals the end of programming the pulse sequence. It tells the SpinAPI library that the sequence definition is complete and the pulse program can be finalized
+                print(f"spinapi.pb_stop_programming()")
+            spinapi.pb_start()
+
+            #el el timepo total que espera el counter para seguir a la siguient variacion. Durante ese tiempo se toman todo los datos de una variacion. Aqui se debe calcular el maximo tiempo de cada variacion y multiplicar por value _loop 
+            timeout = (value_loop*10*1.2) 
+            for channel in self.channels:
+                if channel.label=='apd':
+                    counts = counter.read(value_loop,timeout=timeout) 
+                    count_0=counts[0]
+                    counts = np.diff(counts) # instead of accumulating values ex (5,11,21) it gives (5,6,10)
+                    print(counts)
+            #data=counter.read(value_loop)
+            #spinapi.pb_stop()
+            #spinapi.pb_close
+            pass 
+
+            
 
 
-    def Send_to_Pulse_Blaster(self,Flat_exp):
+    def b_Send_to_Pulse_Blaster(self,Flat_exp):
         """
         Here we recieve the flat list with all the pulses, which we then sent to the PB
         Even if there nos laser device for example apd, it will not through an error and,
