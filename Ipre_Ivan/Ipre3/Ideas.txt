@@ -21,7 +21,7 @@ Mayor change to the UI file:
     Also want to change the ui, to have the photo frames and the simulation in the same graph
 
 To convert ui to py:
-    - cd /Users/ivankalergis/Documents/GitHub/Codig_Controlador_Pulsos/Ipre_Ivan/Ipre2
+    - cd /Users/ivankalergis/Documents/GitHub/Codig_Controlador_Pulsos/Ipre_Ivan/Ipre3
     - /Users/ivankalergis/Library/Python/3.8/bin/pyside2-uic General_Pulses_2.ui -o Sequence_one.py
 
 Task: tipo de programmacion de entradas y salidas de la NIH
