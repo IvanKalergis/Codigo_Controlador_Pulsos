@@ -1,0 +1,43 @@
+Diferences bewteen Ipre and Nuevo intento: 
+    - In ipre we had lists on the logic, that each had every single channels with every single pulse. But in N.I we have lists that have Channel instances, were each instance has its own variables, this will allow for shorter "for" loops to find the correct channel
+    
+idea:
+    maybe a great way to turn my code to a more efficient verison is to add a  sequence class. because a channel will be constituted of many sequences. for example if our experiment consititues of 100 iterations, and we have a sequence1 between the 0-->50 iteration and a sequence2 between the 51--->100 iteration. our channel must include both of this. 
+
+    We will also need to add the option when adding a pulse. if to add it to an specific sequence of the channel or to the whole channel.
+
+    Important idea: A sequence instance will correspond to 1 iteration of the loop of the experiment.
+
+    What if we dont care if the pulse overlaps? if it overlaps we fuse them together.... and add the fused pulse to the sequence, 
+     -however we still need to finish erasing the pulses that were overlapped from the sequece
+     -Done, but when I delete the pulses then the list goes out of range in the for loop
+     -Done, it seems to be working when I fuse together pulses and also deleting the pulses that were already fused.
+
+Mayor change to the UI file:
+    Before we used to add pulses to the whole channel, now when adding a pulse we must select between which iterations the pulse is added to and how it varies per iteration.
+
+    This also forces us to when adding a pulse, specifiying on the combobox Type_Change if we wish to change a pulse or add a new one. But we can leave this for later
+
+    Also want to change the ui, to have the photo frames and the simulation in the same graph
+
+To convert ui to py:
+    - cd /Users/ivankalergis/Documents/GitHub/Codig_Controlador_Pulsos/Ipre_Ivan/Ipre2
+    - /Users/ivankalergis/Library/Python/3.8/bin/pyside2-uic General_Pulses_2.ui -o Sequence_one.py
+
+Task: tipo de programmacion de entradas y salidas de la NIH
+    -defines un canal ie: read voltage
+Lo que queda: 
+    HOY
+    Poder eliminar un canal, osino eliminar todo 
+    Esbozar cada secuencia por iteracion seleccionada (no hay porque hacer una simulación)
+    Generar grafico intensidad por tiempo de las cuentas recibidas cuentas por segundo eje y tiempo eje x
+    generar las iteraciones de los pulsos partiendo de 1 en vex de 0
+    Cuando apreto Stop_Experiment debo también parar la toma de cuentas del apd?
+    edit the start time of an already added pulse
+        when changing the option of Type_Change to type=1, allow the Pulses_box to show the options of each pulse
+
+
+
+Cambio A funcionamiento del codigo: 
+    - Antes cada Iteracion del experimento era considerado como una variacion
+    - Ahora cada el total de Iteraciones del experimento sera para una variacion
